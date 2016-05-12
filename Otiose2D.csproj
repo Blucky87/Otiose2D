@@ -16,12 +16,12 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\$(MonoGamePlatform)\$(Platform)\$(Configuration)\</OutputPath>
-    <DefineConstants>DEBUG;OPENGL;OPENAL;XNADESIGNPROVIDED;TRACE;WINDOWS;DESKTOPGL</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;OPENGL;OPENAL;XNADESIGNPROVIDED;WINDOWS;WINDOWSGL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -43,18 +43,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="MonoGame.Framework.Net">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Dependencies\MonoGame\MonoGame.Framework\bin\WindowsGL\AnyCPU\$(Configuration)\MonoGame.Framework.Net.dll</HintPath>
-    </Reference>
     <Reference Include="OpenTK">
       <HintPath>Dependencies\MonoGame\ThirdParty\Dependencies\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="NVorbis">
       <HintPath>Dependencies\MonoGame\ThirdParty\Dependencies\NVorbis\NVorbis.dll</HintPath>
-    </Reference>
-    <Reference Include="MonoGame.Framework">
-      <HintPath>Dependencies\MonoGame\MonoGame.Framework\bin\WindowsGL\AnyCPU\$(Configuration)\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
@@ -69,6 +62,14 @@
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="Dependencies\MonoGame\MonoGame.Framework\MonoGame.Framework.Net.WindowsGL.csproj">
+      <Project>{6d6009f4-0afb-4806-89d7-7945f20270f5}</Project>
+      <Name>MonoGame.Framework.Net.WindowsGL</Name>
+    </ProjectReference>
+    <ProjectReference Include="Dependencies\MonoGame\MonoGame.Framework\MonoGame.Framework.WindowsGL.csproj">
+      <Project>{6d75e618-19ca-4c51-9546-f10965fbc0b8}</Project>
+      <Name>MonoGame.Framework.WindowsGL</Name>
+    </ProjectReference>
     <ProjectReference Include="Dependencies\Nez\Nez-PCL\Nez.csproj">
       <Project>{60b7197d-d0d5-405c-90a2-a56903e9b039}</Project>
       <Name>Nez</Name>

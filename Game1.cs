@@ -14,8 +14,8 @@ namespace Otiose
         {
             base.Initialize();
 
-            //Window.ClientSizeChanged += Core.onClientSizeChanged;
-            //Window.AllowUserResizing = true;
+            Window.ClientSizeChanged += Core.onClientSizeChanged;
+            Window.AllowUserResizing = true;
 
             // load up your initial scene here
             scene = Scene.createWithDefaultRenderer(Color.MonoGameOrange);

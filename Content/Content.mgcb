@@ -10,8 +10,5 @@
 
 #-------------------------------- References --------------------------------#
 
-/reference:../Dependencies/Nez/PipelineImporter/bin/Debug/Newtonsoft.Json.dll
-/reference:../Dependencies/Nez/PipelineImporter/bin/Debug/PipelineImporter.dll
-/reference:../Dependencies/Nez/Nez-PCL/bin/Debug/Nez.dll
 #---------------------------------- Content ---------------------------------#
 

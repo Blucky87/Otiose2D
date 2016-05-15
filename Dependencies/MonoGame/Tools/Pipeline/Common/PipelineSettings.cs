@@ -2,9 +2,12 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.IO.IsolatedStorage;
+using System.Text;
 using System.Xml.Serialization;
 
 namespace MonoGame.Tools.Pipeline
@@ -13,7 +16,6 @@ namespace MonoGame.Tools.Pipeline
     {
         private const string SettingsPath = "Settings.xml";
         private IsolatedStorageFile _isoStore;
-        private bool _isoStoreInit;
 
         public static PipelineSettings Default { get; private set; }
 
@@ -31,13 +33,7 @@ namespace MonoGame.Tools.Pipeline
         public PipelineSettings()
         {
             ProjectHistory = new List<string>();
-
-            try
-            {
-                _isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
-                _isoStoreInit = true;
-            }
-            catch { }
+            _isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);            
         }
 
         /// <summary>
@@ -65,53 +61,32 @@ namespace MonoGame.Tools.Pipeline
 
         public void Save()
         {
-            if (!_isoStoreInit)
-                return;
+            var mode = FileMode.CreateNew;
+            if (_isoStore.FileExists (SettingsPath)) 
+				mode = FileMode.Truncate;
 
-            try
+            using (var isoStream = new IsolatedStorageFileStream(SettingsPath, mode, _isoStore))
             {
-                var mode = FileMode.CreateNew;
-                if (_isoStore.FileExists(SettingsPath))
-                    mode = FileMode.Truncate;
-
-                using (var isoStream = new IsolatedStorageFileStream(SettingsPath, mode, _isoStore))
+                using (var writer = new StreamWriter(isoStream))
                 {
-                    using (var writer = new StreamWriter(isoStream))
-                    {
-                        var serializer = new XmlSerializer(typeof(PipelineSettings));
-                        serializer.Serialize(writer, this);
-                    }
+                    var serializer = new XmlSerializer(typeof(PipelineSettings));
+                    serializer.Serialize(writer, this);
                 }
-            } catch { }
+            }
         }
 
         public void Load()
 		{
-            if (!_isoStoreInit)
-                return;
-            
-            try
+            if (_isoStore.FileExists(SettingsPath))
             {
-                if (_isoStore.FileExists(SettingsPath))
+                using (var isoStream = new IsolatedStorageFileStream(SettingsPath, FileMode.Open, _isoStore))
                 {
-                    using (var isoStream = new IsolatedStorageFileStream(SettingsPath, FileMode.Open, _isoStore))
+                    using (var reader = new StreamReader(isoStream))
                     {
-                        using (var reader = new StreamReader(isoStream))
-                        {
-                            var serializer = new XmlSerializer(typeof(PipelineSettings));
-                            Default = (PipelineSettings)serializer.Deserialize(reader);
-
-                            var history = Default.ProjectHistory.ToArray();
-                            foreach (var h in history)
-                                if (!File.Exists(h))
-                                    Default.ProjectHistory.Remove(h);
-                        }
+                        var serializer = new XmlSerializer(typeof(PipelineSettings));
+                        Default = (PipelineSettings)serializer.Deserialize(reader);
                     }
                 }
-            }
-            catch
-            {
-                Save();
             }
         }
     }

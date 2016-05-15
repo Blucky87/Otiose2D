@@ -71,12 +71,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformGetData<T>(CubeMapFace cubeMapFace, T[] data) where T : struct
         {
-#if OPENGL && (MONOMAC || DESKTOPGL)
+#if OPENGL && MONOMAC
             TextureTarget target = GetGLCubeFace(cubeMapFace);
-            GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
-            GraphicsExtensions.CheckGLError();
-            GL.GetTexImage<T>(target, 0, glFormat, glType, data);
-            GraphicsExtensions.CheckGLError();
+            GL.BindTexture(target, this.glTexture);
+            // 4 bytes per pixel
+            if (data.Length < size * size * 4)
+                throw new ArgumentException("data");
+
+            GL.GetTexImage<T>(target, 0, PixelFormat.Bgra,
+                PixelType.UnsignedByte, data);
 #else
             throw new NotImplementedException();
 #endif

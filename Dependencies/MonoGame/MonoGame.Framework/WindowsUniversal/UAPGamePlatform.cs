@@ -24,6 +24,7 @@ namespace Microsoft.Xna.Framework
 {
     class UAPGamePlatform : GamePlatform
     {
+		//private OpenALSoundController soundControllerInstance = null;
         internal static string LaunchParameters;
 
         internal static readonly TouchQueue TouchQueue = new TouchQueue();
@@ -179,17 +180,7 @@ namespace Microsoft.Xna.Framework
             ApplicationView.GetForCurrentView().ExitFullScreenMode();
         }
 
-        internal override void OnPresentationChanged()
-        {
-            var presentationParameters = Game.GraphicsDevice.PresentationParameters;
-
-            if (presentationParameters.IsFullScreen)
-                EnterFullScreen();
-            else
-                ExitFullScreen();
-        }
-
-        public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
+		public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
         }
 

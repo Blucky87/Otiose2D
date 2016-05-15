@@ -27,86 +27,44 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// Gets the raw audio data.
         /// </summary>
         /// <value>If unprocessed, the source data; otherwise, the processed data.</value>
-        public ReadOnlyCollection<byte> Data
-        {
-            get
-            {
-                return data.AsReadOnly();
-            }
-        }
+        public ReadOnlyCollection<byte> Data { get { return data.AsReadOnly(); } }
 
         /// <summary>
         /// Gets the duration (in milliseconds) of the audio data.
         /// </summary>
         /// <value>Duration of the audio data.</value>
-        public TimeSpan Duration
-        {
-            get
-            {
-                return duration;
-            }
-        }
+        public TimeSpan Duration { get { return duration; } }
 
         /// <summary>
         /// Gets the file name containing the audio data.
         /// </summary>
         /// <value>The name of the file containing this data.</value>
         [ContentSerializerAttribute]
-        public string FileName
-        {
-            get
-            {
-                return fileName;
-            }
-        }
+        public string FileName { get { return fileName; } }
 
         /// <summary>
         /// Gets the AudioFileType of this audio source.
         /// </summary>
         /// <value>The AudioFileType of this audio source.</value>
-        public AudioFileType FileType
-        {
-            get
-            {
-                return fileType;
-            }
-        }
+        public AudioFileType FileType { get { return fileType; } }
 
         /// <summary>
         /// Gets the AudioFormat of this audio source.
         /// </summary>
         /// <value>The AudioFormat of this audio source.</value>
-        public AudioFormat Format
-        {
-            get
-            {
-                return format;
-            }
-        }
+        public AudioFormat Format { get { return format; } }
 
         /// <summary>
         /// Gets the loop length, in samples.
         /// </summary>
         /// <value>The number of samples in the loop.</value>
-        public int LoopLength
-        {
-            get
-            {
-                return loopLength;
-            }
-        }
+        public int LoopLength { get { return loopLength; } }
 
         /// <summary>
         /// Gets the loop start, in samples.
         /// </summary>
         /// <value>The number of samples to the start of the loop.</value>
-        public int LoopStart
-        {
-            get
-            {
-                return loopStart;
-            }
-        }
+        public int LoopStart { get { return loopStart; } }
 
         /// <summary>
         /// Initializes a new instance of AudioContent.
@@ -165,7 +123,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// the audio is stored external to the XNB file.  If this is null, then the converted audio is stored in
         /// the Data property.
         /// </param>
-        public ConversionQuality ConvertFormat(ConversionFormat formatType, ConversionQuality quality, string saveToFile)
+        public void ConvertFormat(ConversionFormat formatType, ConversionQuality quality, string saveToFile)
         {
             var temporarySource = Path.GetTempFileName();
             var temporaryOutput = Path.GetTempFileName();
@@ -227,25 +185,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 }
 
                 string ffmpegStdout, ffmpegStderr;
-                int ffmpegExitCode = 0;
-                do
-                {
-                    ffmpegExitCode = ExternalTool.Run(
-                        "ffmpeg",
-                        string.Format(
-                            "-y -i \"{0}\" -vn -c:a {1} -b:a {2} -f:a {3} -strict experimental \"{4}\"",
-                            temporarySource,
-                            ffmpegCodecName,
-                            QualityToBitRate(quality),
-                            ffmpegMuxerName,
-                            temporaryOutput),
-                        out ffmpegStdout,
-                        out ffmpegStderr);
-                    if (ffmpegExitCode != 0)
-                    {
-                        quality--;
-                    }
-                } while (quality >= 0 && ffmpegExitCode!=0);
+                var ffmpegExitCode = ExternalTool.Run(
+                    "ffmpeg",
+                    string.Format(
+                        "-y -i \"{0}\" -vn -c:a {1} -b:a {2} -f:a {3} -strict experimental \"{4}\"",
+                        temporarySource,
+                        ffmpegCodecName,
+                        QualityToBitRate(quality),
+                        ffmpegMuxerName,
+                        temporaryOutput),
+                    out ffmpegStdout,
+                    out ffmpegStderr);
                 if (ffmpegExitCode != 0)
                 {
                     throw new InvalidOperationException("ffmpeg exited with non-zero exit code: \n" + ffmpegStdout + "\n" + ffmpegStderr);
@@ -360,7 +310,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 File.Delete(temporarySource);
                 File.Delete(temporaryOutput);
             }
-            return quality;
         }
 
         private void Read(string filename)
@@ -434,5 +383,5 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 
             return audioData;
         }
-    }
+	}
 }

@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework
 #if MONOMAC
             return new MacGamePlatform(game);
 #elif DESKTOPGL || ANGLE
-            return new SdlGamePlatform(game);
+            return new OpenTKGamePlatform(game);
 #elif WINDOWS && DIRECTX
             return new MonoGame.Framework.WinFormsGamePlatform(game);
 #elif WINDOWS_UAP

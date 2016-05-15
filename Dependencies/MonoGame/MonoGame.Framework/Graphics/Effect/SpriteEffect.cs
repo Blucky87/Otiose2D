@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Graphics
     /// <summary>
     /// The default effect used by SpriteBatch.
     /// </summary>
-    public class SpriteEffect : Effect
+    internal class SpriteEffect : Effect
     {
         #region Effect Parameters
 

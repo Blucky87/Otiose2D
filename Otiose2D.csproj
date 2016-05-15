@@ -39,8 +39,82 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Game1.cs" />
+    <Compile Include="InputManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="scenes\testscene.cs" />
+    <Compile Include="src\ecs\PlayerInputManager.cs" />
+    <Compile Include="src\input\setup\Action1IsPressed.cs" />
+    <Compile Include="src\input\setup\Action1WasPressed.cs" />
+    <Compile Include="src\input\setup\Action1WasReleased.cs" />
+    <Compile Include="src\input\setup\Action2IsPressed.cs" />
+    <Compile Include="src\input\setup\Action2WasPressed.cs" />
+    <Compile Include="src\input\setup\Action2WasReleased.cs" />
+    <Compile Include="src\input\setup\BlankControllerActions.cs" />
+    <Compile Include="src\input\setup\Command.cs" />
+    <Compile Include="src\input\setup\CommandInvoker.cs" />
+    <Compile Include="src\input\setup\ControlBehavior.cs" />
+    <Compile Include="src\input\setup\ControllerProfile.cs" />
+    <Compile Include="src\input\setup\InputActionSet.cs" />
+    <Compile Include="src\input\setup\LeftBumperIsPressed.cs" />
+    <Compile Include="src\input\setup\LeftBumperWasPressed.cs" />
+    <Compile Include="src\input\setup\LeftBumperWasReleased.cs" />
+    <Compile Include="src\input\setup\LeftStickIsPressed.cs" />
+    <Compile Include="src\input\setup\LeftStickWasPressed.cs" />
+    <Compile Include="src\input\setup\LeftStickWasReleased.cs" />
+    <Compile Include="src\input\setup\PlayerManager.cs" />
+    <Compile Include="src\input\setup\RightBumperIsPressed.cs" />
+    <Compile Include="src\input\setup\RightBumperWasPressed.cs" />
+    <Compile Include="src\input\setup\RightBumperWasReleased.cs" />
+    <Compile Include="src\input\setup\RightStickIsPressed.cs" />
+    <Compile Include="src\input\setup\RightStickWasPressed.cs" />
+    <Compile Include="src\input\setup\RightStickWasReleased.cs" />
+    <Compile Include="src\input\setup\RoamControllerProfile.cs" />
+    <Compile Include="src\input\setup\RoamingControllerActions.cs" />
+    <Compile Include="src\input\setup\TwoAxisControlBehavior.cs" />
+    <Compile Include="src\input\system\BindingListeningOptions.cs" />
+    <Compile Include="src\input\system\BindingSource.cs" />
+    <Compile Include="src\input\system\BindingSourceListener.cs" />
+    <Compile Include="src\input\system\BindingSourceRejectionType.cs" />
+    <Compile Include="src\input\system\BindingSourceType.cs" />
+    <Compile Include="src\input\system\DeviceBindingSource.cs" />
+    <Compile Include="src\input\system\DeviceBindingSourceListener.cs" />
+    <Compile Include="src\input\system\IInputControl.cs" />
+    <Compile Include="src\input\system\InputControl.cs" />
+    <Compile Include="src\input\system\InputControlBase.cs" />
+    <Compile Include="src\input\system\InputControlMapping.cs" />
+    <Compile Include="src\input\system\InputControlSource.cs" />
+    <Compile Include="src\input\system\InputControlState.cs" />
+    <Compile Include="src\input\system\InputControlType.cs" />
+    <Compile Include="src\input\system\InputDevice.cs" />
+    <Compile Include="src\input\system\InputDeviceManger.cs" />
+    <Compile Include="src\input\system\InputDeviceProfile.cs" />
+    <Compile Include="src\input\system\InputRange.cs" />
+    <Compile Include="src\input\system\InputRangeType.cs" />
+    <Compile Include="src\input\system\Key.cs" />
+    <Compile Include="src\input\system\KeyBindingSource.cs" />
+    <Compile Include="src\input\system\KeyBindingSourceListener.cs" />
+    <Compile Include="src\input\system\KeyCode.cs" />
+    <Compile Include="src\input\system\KeyCombo.cs" />
+    <Compile Include="src\input\system\KeyInfo.cs" />
+    <Compile Include="src\input\system\Mouse.cs" />
+    <Compile Include="src\input\system\MouseBindingSource.cs" />
+    <Compile Include="src\input\system\MouseBindingSourceListener.cs" />
+    <Compile Include="src\input\system\OneAxisInputControl.cs" />
+    <Compile Include="src\input\system\PlayerAction.cs" />
+    <Compile Include="src\input\system\PlayerActionSet.cs" />
+    <Compile Include="src\input\system\PlayerOneAxisAction.cs" />
+    <Compile Include="src\input\system\PlayerTwoAxisAction.cs" />
+    <Compile Include="src\input\system\RingBuffer.cs" />
+    <Compile Include="src\input\system\TwoAxisInputControl.cs" />
+    <Compile Include="src\input\system\UnityInputDevice.cs" />
+    <Compile Include="src\input\system\UnknownDeviceBindingSource.cs" />
+    <Compile Include="src\input\system\UnknownDeviceBindingSourceListener1.cs" />
+    <Compile Include="src\input\system\UnknownDeviceControl.cs" />
+    <Compile Include="src\input\system\UnknownUnityInputDevice.cs" />
+    <Compile Include="src\input\system\Utility.cs" />
+    <Compile Include="src\input\system\XInputDevice.cs" />
+    <Compile Include="src\input\system\XInputDeviceManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="OpenTK">
@@ -54,6 +128,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Icon.ico" />
+    <Content Include="Content\DownBreathing.png" />
     <Content Include="OpenTK.dll.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -71,9 +146,17 @@
       <Name>MonoGame.Framework.WindowsGL</Name>
     </ProjectReference>
     <ProjectReference Include="Dependencies\Nez\Nez-PCL\Nez.csproj">
-      <Project>{60b7197d-d0d5-405c-90a2-a56903e9b039}</Project>
+      <Project>{60B7197D-D0D5-405C-90A2-A56903E9B039}</Project>
       <Name>Nez</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\nez\NezDefaultBMFont.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildProjectDirectory)\Dependencies\MonoGame.Content.Builder.targets" />

@@ -3,8 +3,13 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using Eto;
-using Eto.Forms;
+using System.Diagnostics;
+#if WINDOWS
+using System.Windows.Forms;
+#endif
+#if MONOMAC
+using Gtk;
+#endif
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -14,27 +19,46 @@ namespace MonoGame.Tools.Pipeline
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main(string[] args)
+        static void Main(string [] args)
         {
-            var platform = Platform.Detect;
+#if WINDOWS
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
 
-            var app = new Application(platform);
-            Styles.Load();
+            PipelineSettings.Default.Load();
 
-            var win = new MainWindow();
-            var controller = PipelineController.Create(win);
+			var view = new MainView();
+            if (args != null && args.Length > 0)
+            {
+                var projectFilePath = string.Join(" ", args);
+                view.OpenProjectPath = projectFilePath;
+            }
 
-            string project = null;
+            var controller = new PipelineController(view);
+            Application.Run(view);
+#endif
+#if LINUX || MONOMAC
 
-            if (Global.Unix && !Global.Linux)
-                project = Environment.GetEnvironmentVariable("MONOGAME_PIPELINE_PROJECT");
-            else if (args != null && args.Length > 0)
-                project = string.Join(" ", args);
-
-            if (!string.IsNullOrEmpty(project))
-                controller.OpenProject(project);
-
-            app.Run(win);
+			Gtk.Application.Init ();
+            Global.Initalize ();
+			MainWindow win = new MainWindow ();
+			win.Show (); 
+			new PipelineController(win);
+			#if LINUX
+			if (args != null && args.Length > 0)
+			{
+				var projectFilePath = string.Join(" ", args);
+				win.OpenProjectPath = projectFilePath;
+			}
+			#elif MONOMAC
+			var project = Environment.GetEnvironmentVariable("MONOGAME_PIPELINE_PROJECT");
+			if (!string.IsNullOrEmpty (project)) {
+				win.OpenProjectPath = project;
+			}
+			#endif
+			win.OnShowEvent ();
+			Gtk.Application.Run ();
+#endif
         }
     }
 }

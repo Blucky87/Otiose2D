@@ -88,12 +88,8 @@ namespace Nez.Console
 			{
 				_drawCallTimer = Core.schedule( delay, true, timer =>
 				{
-#if DEBUG
-                    Debug.log( "Draw Calls: {0}", Core.drawCalls );
-#else
-                    Debug.log("Draw Calls available in DEBUG mode only");
-#endif
-                } );
+					Debug.log( "Draw Calls: {0}", Core.drawCalls );
+				} );
 			}
 		}
 

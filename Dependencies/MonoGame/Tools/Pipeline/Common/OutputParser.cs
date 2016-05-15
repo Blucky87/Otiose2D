@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public enum OutputState
+    enum OutputState
     {
         Initialized,
         BuildBegin,
@@ -22,7 +22,7 @@ namespace MonoGame.Tools.Pipeline
         Unknown
     }
 
-    public class OutputParser
+    class OutputParser
     {
         internal OutputState State { get; private set; }
         internal String Filename { get; private set; }

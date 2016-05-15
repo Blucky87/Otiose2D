@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework
     /// <summary>
     /// Describes a 4D-vector.
     /// </summary>
-#if XNADESIGNPROVIDED
+#if WINDOWS
     [System.ComponentModel.TypeConverter(typeof(Microsoft.Xna.Framework.Design.Vector4TypeConverter))]
 #endif
     [DataContract]

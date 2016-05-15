@@ -33,7 +33,7 @@ namespace Microsoft.Xna.Framework.Media
         private SongCollection songCollection;
 #if WINDOWS_STOREAPP || WINDOWS_UAP
         private StorageItemThumbnail thumbnail;
-#elif IOS && !TVOS
+#elif IOS
         private MPMediaItemArtwork thumbnail;
 #elif ANDROID
         private Android.Net.Uri thumbnail;
@@ -173,7 +173,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             this.thumbnail = thumbnail;
         }
-#elif IOS && !TVOS
+#elif IOS
         internal Album(SongCollection songCollection, string name, Artist artist, Genre genre, MPMediaItemArtwork thumbnail)
             : this(songCollection, name, artist, genre)
         {

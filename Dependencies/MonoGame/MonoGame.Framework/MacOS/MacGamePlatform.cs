@@ -103,6 +103,7 @@ namespace Microsoft.Xna.Framework
         private MacGameNSWindow _mainWindow;
         private GameWindow _gameWindow;
         private bool _wasResizeable;
+        private OpenALSoundController soundControllerInstance = null;
 
         public MacGamePlatform(Game game) :
             base(game)
@@ -111,14 +112,7 @@ namespace Microsoft.Xna.Framework
             game.Services.AddService(typeof(MacGamePlatform), this);
 
             // Setup our OpenALSoundController to handle our SoundBuffer pools
-            try
-            {
-                OpenALSoundController soundControllerInstance = OpenALSoundController.GetInstance;
-            }
-            catch (DllNotFoundException ex)
-            {
-                throw (new NoAudioHardwareException("Failed to init OpenALSoundController", ex));
-            }
+            soundControllerInstance = OpenALSoundController.GetInstance;
 
             InitializeMainWindow();
 
@@ -271,6 +265,8 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
+            // Update our OpenAL sound buffer pools
+            soundControllerInstance.Update();
             if (_needsToResetElapsedTime)
                 _needsToResetElapsedTime = false;
 

@@ -143,9 +143,8 @@ namespace Microsoft.Xna.Framework.Audio
 			AL.Source (SourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
             ALHelper.CheckError("Failed to set source pitch.");
 
-            AL.SourcePlay(SourceId);
-            ALHelper.CheckError("Failed to play source.");
-
+            controller.PlaySound (this);
+            //Console.WriteLine ("playing: " + sourceId + " : " + soundEffect.Name);
             SoundState = SoundState.Playing;
         }
 
@@ -177,6 +176,9 @@ namespace Microsoft.Xna.Framework.Audio
         {
             if (HasSourceId)
             {
+                //Console.WriteLine ("stop " + sourceId + " : " + soundEffect.Name);
+                
+
                 if (!controller.CheckInitState())
                 {
                     return;

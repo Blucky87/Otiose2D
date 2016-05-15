@@ -535,7 +535,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #if DESKTOPGL || MONOMAC
-        internal void SaveAsImage(Stream stream, int width, int height, ImageFormat format)
+		private void SaveAsImage(Stream stream, int width, int height, ImageFormat format)
 		{
 			if (stream == null)
 			{

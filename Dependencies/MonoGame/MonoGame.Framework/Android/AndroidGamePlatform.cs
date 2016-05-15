@@ -11,6 +11,8 @@ namespace Microsoft.Xna.Framework
 {
     class AndroidGamePlatform : GamePlatform
     {
+        OpenALSoundController soundControllerInstance = null;
+
         public AndroidGamePlatform(Game game)
             : base(game)
         {
@@ -25,7 +27,7 @@ namespace Microsoft.Xna.Framework
             MediaLibrary.Context = Game.Activity;
             try
             {
-                OpenALSoundController soundControllerInstance = OpenALSoundController.GetInstance;
+                soundControllerInstance = OpenALSoundController.GetInstance;
             }
             catch (DllNotFoundException ex)
             {

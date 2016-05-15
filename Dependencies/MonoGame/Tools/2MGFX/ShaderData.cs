@@ -19,11 +19,10 @@ namespace TwoMGFX
 
 		public struct Attribute
 		{
-            public string name;
-            public VertexElementUsage usage;
 			public int index;
-            public int location;
-        }
+			public string name;
+			public VertexElementUsage usage;
+		}
 
 		/// <summary>
 		/// The index to the constant buffers which are 

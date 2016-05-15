@@ -428,6 +428,16 @@ namespace Microsoft.Xna.Framework.GamerServices
             //}
 		}
 
+		public static IAsyncResult BeginShowStorageDeviceSelector( AsyncCallback callback, object state )
+		{
+			return null;
+		}
+
+		public static MGXna_Framework.Storage.StorageDevice EndShowStorageDeviceSelector( IAsyncResult result )
+		{
+			return null;
+		}
+
 		#region Properties
 		public static bool IsScreenSaverEnabled 
 		{ 

@@ -31,4 +31,3 @@ namespace Microsoft.Xna.Framework.Input
         }
     }
 }
-

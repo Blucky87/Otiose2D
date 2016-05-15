@@ -10,5 +10,20 @@
 
 #-------------------------------- References --------------------------------#
 
+/reference:../Dependencies/Nez/PipelineImporter/bin/Debug/Newtonsoft.Json.dll
+/reference:../Dependencies/Nez/PipelineImporter/bin/Debug/PipelineImporter.dll
+
 #---------------------------------- Content ---------------------------------#
+
+#begin DownBreathing.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:DownBreathing.png
 

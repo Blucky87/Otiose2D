@@ -1,13 +1,15 @@
 ﻿using System.CodeDom;
+using System.Xml;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Nez;
 using Nez.Sprites;
 using Nez.Textures;
-using Otiose.Input.Setup;
 
-namespace Otiose
+
+
+namespace Otiose2D
 {
     public class Game1 : Core
     {
@@ -25,8 +27,10 @@ namespace Otiose
         {
             InputManager.Setup();
 
+            Window.ClientSizeChanged += Core.onClientSizeChanged;
+
             //Window.AllowUserResizing = true;
-            
+
             otherScene = Scene.createWithDefaultRenderer(Color.CornflowerBlue);
             // create our Scene with the DefaultRenderer and a clear color of CornflowerBlue
             var myScene = Scene.createWithDefaultRenderer(Color.CornflowerBlue);
@@ -58,6 +62,11 @@ namespace Otiose
 
         protected override void Update(GameTime gametime) {
             InputManager.Update();
+           
+            if(Input.isKeyDown(Keys.Escape))
+            {
+                
+            }
 
 /*            if(Input.isKeyDown(Keys.A)) {
                 var img2 = otherScene.contentManager.Load<Texture2D>("DownBreathing");
@@ -79,7 +88,7 @@ namespace Otiose
                 entity2.getComponent<Sprite<int>>().play(0);
                 Core.scene = otherScene;
             }
-            */
+*/
             base.Update(gametime);
         }
 

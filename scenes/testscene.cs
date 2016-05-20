@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Nez;
 
-namespace Otiose.Scenes
+namespace Otiose2D.Scenes
 {
     class testscene : Scene
     {

@@ -1,4 +1,5 @@
 ﻿using System.CodeDom;
+using System.Collections.Generic;
 using System.Xml;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -6,7 +7,8 @@ using Microsoft.Xna.Framework.Input;
 using Nez;
 using Nez.Sprites;
 using Nez.Textures;
-
+using Otiose2D.animation;
+using Otiose2D.Input.Setup;
 
 
 namespace Otiose2D
@@ -35,9 +37,27 @@ namespace Otiose2D
             // create our Scene with the DefaultRenderer and a clear color of CornflowerBlue
             var myScene = Scene.createWithDefaultRenderer(Color.CornflowerBlue);
 
-            var img = myScene.contentManager.Load<Texture2D>("DownBreathing");
-            var entity = myScene.createEntity("first-sprite");
+            Texture2D img = myScene.contentManager.Load<Texture2D>("DownBreathing");
+            Entity entity = myScene.createEntity("first-sprite");
 
+            Rectangle rect = new Rectangle(0,0,64,64);
+            Rectangle rect2 = new Rectangle(64, 64, 64, 64);
+            Rectangle rect3 = new Rectangle(128, 128, 64, 64);
+            Rectangle rect4 = new Rectangle(192, 192, 64, 64);
+
+            List<AnimationFrame> theframes = new List<AnimationFrame>();
+            AnimationFrame frame1 = new AnimationFrame("frame", rect, 1);
+            AnimationFrame frame2 = new AnimationFrame("frame2", rect, 1);
+            AnimationFrame frame3 = new AnimationFrame("frame3", rect, 1);
+            AnimationFrame frame4 = new AnimationFrame("frame4", rect, 1);
+            theframes.Add(new AnimationFrame("frame", rect, 1));
+            theframes.Add(new AnimationFrame("frame2", rect2, 2));
+            theframes.Add(new AnimationFrame("frame3", rect3, 3));
+            theframes.Add(new AnimationFrame("frame4", rect4, 4));
+
+            AnimationClip clip = new AnimationClip("test", img, theframes );
+
+            AnimationClipManager animManager = new AnimationClipManager(clip);
             
             entity.transform.position = new Vector2(300,300);
             var subtextures = Subtexture.subtexturesFromAtlas(img, 64, 64);
@@ -63,7 +83,7 @@ namespace Otiose2D
         protected override void Update(GameTime gametime) {
             InputManager.Update();
            
-            if(Input.isKeyDown(Keys.Escape))
+            if(Nez.Input.isKeyDown(Keys.Escape))
             {
                 
             }

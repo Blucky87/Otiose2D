@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using Nez;
 using Nez.Console;
-using Otiose.Input;
+using Otiose2D.Input;
 
-namespace Otiose
+namespace Otiose2D
 {
     public class InputManager
     {

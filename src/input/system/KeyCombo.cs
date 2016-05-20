@@ -6,7 +6,7 @@ using System.Text;
 using Microsoft.Xna.Framework.Input;
 using OpenTK.Input;
 
-namespace Otiose.Input
+namespace Otiose2D.Input
 {
     /// <summary>
     /// Represents a combination of one or more keys, including modifiers, up to a maximum of eight.

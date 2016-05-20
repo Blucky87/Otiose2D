@@ -1,4 +1,4 @@
-﻿namespace Otiose.Input.Setup {
+﻿namespace Otiose2D.Input.Setup {
     public class RightBumperWasReleased : Command {
 
         public RightBumperWasReleased(ControllerProfile Profile) {

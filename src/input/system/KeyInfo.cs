@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Input;
 
-namespace Otiose.Input
+namespace Otiose2D.Input
 {
     public struct KeyInfo
     {

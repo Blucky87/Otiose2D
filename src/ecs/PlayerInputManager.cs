@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework.Input;
 using Nez;
 
-namespace Otiose.Input.Setup
+namespace Otiose2D.Input.Setup
 {
     public sealed class PlayerInputManager : Component, IUpdatable {
 

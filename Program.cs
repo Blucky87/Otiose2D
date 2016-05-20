@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Otiose
+namespace Otiose2D
 {
     /// <summary>
     /// The main class.

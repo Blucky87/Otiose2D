@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Microsoft.Xna.Framework.Input;
 
-namespace Otiose.Input
+namespace Otiose2D.Input
 {
     public class KeyBindingSource : BindingSource
     {

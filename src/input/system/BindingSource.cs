@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Otiose.Input
+namespace Otiose2D.Input
 {
     /// <summary>
     /// The abstract base class for all binding sources.

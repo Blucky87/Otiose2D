@@ -1,6 +1,6 @@
 ﻿
 
-namespace Otiose.Input.Setup {
+namespace Otiose2D.Input.Setup {
     public class Action2WasReleased : Command {
 
         public Action2WasReleased(ControllerProfile Profile) {

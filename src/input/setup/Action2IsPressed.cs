@@ -1,4 +1,4 @@
-﻿namespace Otiose.Input.Setup {
+﻿namespace Otiose2D.Input.Setup {
     public class Action2IsPressed : Command {
 
         public Action2IsPressed(ControllerProfile Profile) {

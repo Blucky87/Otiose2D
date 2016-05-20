@@ -2,7 +2,7 @@
 using System.IO;
 using Nez;
 
-namespace Otiose.Input
+namespace Otiose2D.Input
 {
     public class MouseBindingSource : BindingSource
     {

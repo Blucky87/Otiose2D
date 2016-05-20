@@ -7,7 +7,7 @@ using System.Text;
 using Microsoft.Xna.Framework.Input;
 using Nez;
 
-namespace Otiose.Input
+namespace Otiose2D.Input
 {
     /// <summary>
     /// This class represents a single action that may have multiple controls bound to it.

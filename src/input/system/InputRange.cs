@@ -1,7 +1,7 @@
 ﻿using System;
 using Nez;
 
-namespace Otiose.Input
+namespace Otiose2D.Input
 {
     /// <summary>
     /// This type represents a range inclusive of two values, and can remap a value from one range to another.

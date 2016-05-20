@@ -6,7 +6,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Nez;
 
-namespace Otiose.Input
+namespace Otiose2D.Input
 {
     public static class Utility
     {

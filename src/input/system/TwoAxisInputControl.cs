@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 
-namespace Otiose.Input
+namespace Otiose2D.Input
 {
     public class TwoAxisInputControl : IInputControl
     {

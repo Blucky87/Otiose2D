@@ -1,4 +1,4 @@
-﻿using Otiose.Input.Setup;
+﻿using Otiose2D.Input.Setup;
 
 public class RoamControllerProfile : ControllerProfile
 {

@@ -1,11 +1,7 @@
 
 
-
-
-
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
-using Nez.UI;
 
 namespace Otiose2D.animation
 {
@@ -17,13 +13,46 @@ namespace Otiose2D.animation
         public WrapMode wrapMode = WrapMode.Loop;
         public float fps = 10f;
         public int startFrame = 0;
+        public float delay = 0f;
+        public float totalDuration = 0f;
+        private bool _hasBeenPreparedForUse = false;
+        public float secondsPerFrame = 1f;
+        public float iterationDuration = 0;
+        public AnimationCompletionBehavior completionBehavior = AnimationCompletionBehavior.RevertToFirstFrame; 
 
         public AnimationClip(string text, Texture2D texture, List<AnimationFrame> animationFrames )
         {
             name = text;
             image = texture;
             frames = animationFrames;
+            prepareForUse();
         }
+
+        public void prepareForUse()
+        {
+            if (_hasBeenPreparedForUse)
+                return;
+
+            secondsPerFrame = 1f / fps;
+            iterationDuration = secondsPerFrame * (float)frames.Count;
+
+            if (wrapMode == WrapMode.Loop)
+                totalDuration = float.PositiveInfinity;
+            else if (wrapMode == WrapMode.PingPong)
+                totalDuration = iterationDuration * 2f;
+            else
+                totalDuration = iterationDuration;
+
+            _hasBeenPreparedForUse = true;
+        }
+
+    }
+
+    public enum AnimationCompletionBehavior
+    {
+        RemainOnFinalFrame,
+        RevertToFirstFrame,
+        HideSprite
     }
 
     public enum WrapMode

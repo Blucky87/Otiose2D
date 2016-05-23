@@ -41,28 +41,32 @@ namespace Otiose2D
             Entity entity = myScene.createEntity("first-sprite");
 
             Rectangle rect = new Rectangle(0,0,64,64);
-            Rectangle rect2 = new Rectangle(64, 64, 64, 64);
-            Rectangle rect3 = new Rectangle(128, 128, 64, 64);
-            Rectangle rect4 = new Rectangle(192, 192, 64, 64);
+            Rectangle rect2 = new Rectangle(64, 0, 64, 64);
+            Rectangle rect3 = new Rectangle(128, 0, 64, 64);
+            Rectangle rect4 = new Rectangle(192, 0, 64, 64);
 
             List<AnimationFrame> theframes = new List<AnimationFrame>();
             theframes.Add(new AnimationFrame( rect, 1));
-            theframes.Add(new AnimationFrame(rect2, 2));
-            theframes.Add(new AnimationFrame(rect3, 3));
+            theframes.Add(new AnimationFrame( rect2, 2));
+            theframes.Add(new AnimationFrame( rect3, 3));
             theframes.Add(new AnimationFrame( rect4, 4));
 
             AnimationClip clip = new AnimationClip("test", img, theframes );
 
             AnimationClipManager animManager = new AnimationClipManager(clip);
             SpriteAnimator animator = new SpriteAnimator(animManager);
-
+            animator.currentClip = clip;
+            animator.currentFrame = animator.currentClip.frames[0];
+            
+            
             
             entity.transform.position = new Vector2(300,300);
 
             entity.addComponent(animator);
 
+            entity.getComponent<SpriteAnimator>().play();
             entity.addComponent(new PlayerInputManager());
-            entity.getComponent<Sprite<int>>().play(0);
+            
 
             // set the scene so Nez can take over
             Core.scene = myScene;

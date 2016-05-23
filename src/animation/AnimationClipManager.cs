@@ -9,6 +9,7 @@ namespace Otiose2D.animation
 
         public AnimationClipManager(AnimationClip clip)
         {
+            Clips = new Dictionary<string, AnimationClip>();
             addClip(clip);
         }
 

@@ -47,7 +47,6 @@
     <Compile Include="src\animation\AnimationClip.cs" />
     <Compile Include="src\animation\AnimationFrame.cs" />
     <Compile Include="src\animation\SpriteAnimator.cs" />
-    <Compile Include="src\ecs\AnimationSpriteComponent.cs" />
     <Compile Include="src\ecs\PlayerInputManager.cs" />
     <Compile Include="src\input\setup\Action1IsPressed.cs" />
     <Compile Include="src\input\setup\Action1WasPressed.cs" />
@@ -120,7 +119,6 @@
     <Compile Include="src\input\system\Utility.cs" />
     <Compile Include="src\input\system\XInputDevice.cs" />
     <Compile Include="src\input\system\XInputDeviceManager.cs" />
-    <Compile Include="src\sprite\BaseSprite.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="OpenTK">

@@ -46,31 +46,21 @@ namespace Otiose2D
             Rectangle rect4 = new Rectangle(192, 192, 64, 64);
 
             List<AnimationFrame> theframes = new List<AnimationFrame>();
-            AnimationFrame frame1 = new AnimationFrame("frame", rect, 1);
-            AnimationFrame frame2 = new AnimationFrame("frame2", rect, 1);
-            AnimationFrame frame3 = new AnimationFrame("frame3", rect, 1);
-            AnimationFrame frame4 = new AnimationFrame("frame4", rect, 1);
-            theframes.Add(new AnimationFrame("frame", rect, 1));
-            theframes.Add(new AnimationFrame("frame2", rect2, 2));
-            theframes.Add(new AnimationFrame("frame3", rect3, 3));
-            theframes.Add(new AnimationFrame("frame4", rect4, 4));
+            theframes.Add(new AnimationFrame( rect, 1));
+            theframes.Add(new AnimationFrame(rect2, 2));
+            theframes.Add(new AnimationFrame(rect3, 3));
+            theframes.Add(new AnimationFrame( rect4, 4));
 
             AnimationClip clip = new AnimationClip("test", img, theframes );
 
             AnimationClipManager animManager = new AnimationClipManager(clip);
+            SpriteAnimator animator = new SpriteAnimator(animManager);
+
             
             entity.transform.position = new Vector2(300,300);
-            var subtextures = Subtexture.subtexturesFromAtlas(img, 64, 64);
-            var spriteAnimation = new SpriteAnimation(subtextures)
-            {
-                loop = true,
-                fps = 10
-            };
 
-            Sprite<int> sprite = new Sprite<int>(0, spriteAnimation);
-            sprite.renderLayer = -1;
-            sprite.addAnimation(0, spriteAnimation);
-            entity.addComponent(sprite);
+            entity.addComponent(animator);
+
             entity.addComponent(new PlayerInputManager());
             entity.getComponent<Sprite<int>>().play(0);
 

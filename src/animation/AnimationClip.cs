@@ -10,13 +10,13 @@ namespace Otiose2D.animation
         public string name = "Default";
         public List<AnimationFrame> frames;
         public Texture2D image;
-        public WrapMode wrapMode = WrapMode.Loop;
+        public PlayMode PlayMode = PlayMode.Loop;
         public float fps = 10f;
         public int startFrame = 0;
         public float delay = 0f;
         public float totalDuration = 0f;
         private bool _hasBeenPreparedForUse = false;
-        public float secondsPerFrame = 1f;
+        public float secondsPerFrame = 1.0f;
         public float iterationDuration = 0;
         public AnimationCompletionBehavior completionBehavior = AnimationCompletionBehavior.RevertToFirstFrame; 
 
@@ -36,9 +36,9 @@ namespace Otiose2D.animation
             secondsPerFrame = 1f / fps;
             iterationDuration = secondsPerFrame * (float)frames.Count;
 
-            if (wrapMode == WrapMode.Loop)
+            if (PlayMode == PlayMode.Loop)
                 totalDuration = float.PositiveInfinity;
-            else if (wrapMode == WrapMode.PingPong)
+            else if (PlayMode == PlayMode.PingPong)
                 totalDuration = iterationDuration * 2f;
             else
                 totalDuration = iterationDuration;
@@ -55,7 +55,7 @@ namespace Otiose2D.animation
         HideSprite
     }
 
-    public enum WrapMode
+    public enum PlayMode
     {
         /// <summary>
         /// Loop indefinitely

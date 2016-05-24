@@ -1,11 +1,15 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 
 namespace Otiose2D.animation
 {
     public class AnimationClipManager
     {
         private Dictionary<string, AnimationClip> Clips;
-        private bool isBaked = false;
+        private string defaultClip = "Default";
+        
 
         public AnimationClipManager(AnimationClip clip)
         {
@@ -23,10 +27,22 @@ namespace Otiose2D.animation
             return Clips[name];
         }
 
-        private void bake()
+        public AnimationClip getDefault()
         {
+            string clipName;
 
+            if (!String.IsNullOrEmpty(defaultClip) && Clips.ContainsKey(defaultClip))
+            {
+                clipName = defaultClip;
+            }
+            else
+            {
+                clipName = Clips.Keys.ElementAtOrDefault(0);
+            }
+            
+            return Clips[ clipName ];
         }
+
 
 
     }

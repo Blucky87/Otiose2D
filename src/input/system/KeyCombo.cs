@@ -77,24 +77,11 @@ namespace Otiose2D.Input
             }
         }
 
-        private static bool hasGone = false;
-
-        private void displayTest() {
-            if(!hasGone) {
-            
-            int size = Enum.GetNames(typeof(Keys)).Length;
-            for(int i = 0; i < size; i++) {
-                Console.WriteLine(Enum.GetNames(typeof(Keys))[i]);
-            }
-                hasGone = true;
-            }
-    }
 
         public bool IsPressed
         {
             get
             {
-                displayTest();
                 if (size == 0)
                 {
                     return false;

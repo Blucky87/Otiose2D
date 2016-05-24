@@ -44,18 +44,18 @@ namespace Otiose2D
             Rectangle rect2 = new Rectangle(64, 0, 64, 64);
             Rectangle rect3 = new Rectangle(128, 0, 64, 64);
             Rectangle rect4 = new Rectangle(192, 0, 64, 64);
-
+            
             List<AnimationFrame> theframes = new List<AnimationFrame>();
-            theframes.Add(new AnimationFrame( rect, 1));
-            theframes.Add(new AnimationFrame( rect2, 2));
-            theframes.Add(new AnimationFrame( rect3, 3));
-            theframes.Add(new AnimationFrame( rect4, 4));
+            theframes.Add(new AnimationFrame( rect, 0));
+            theframes.Add(new AnimationFrame( rect2, 1));
+            theframes.Add(new AnimationFrame( rect3, 2));
+            theframes.Add(new AnimationFrame( rect4, 3));
 
             AnimationClip clip = new AnimationClip("test", img, theframes );
 
             AnimationClipManager animManager = new AnimationClipManager(clip);
             SpriteAnimator animator = new SpriteAnimator(animManager);
-            animator.currentClip = clip;
+            //animator.currentClip = clip;
             animator.currentFrame = animator.currentClip.frames[0];
             
             

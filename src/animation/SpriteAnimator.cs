@@ -20,6 +20,8 @@ namespace Otiose2D.animation
         bool _delayComplete;
         bool _isReversed = false;
         bool _isLoopingBackOnPingPong;
+        int _completedCycles;
+        int _framesPlayed;
 
         public override float width
         {
@@ -72,6 +74,7 @@ namespace Otiose2D.animation
 
         public void update()
         {
+            
             if (currentClip == null || !isPlaying)
                 return;
 
@@ -97,49 +100,45 @@ namespace Otiose2D.animation
 
             _totalElapsedTime = Mathf.clamp(_totalElapsedTime, 0f, currentClip.totalDuration);
             _completedIterations = Mathf.floorToInt(_totalElapsedTime / currentClip.iterationDuration);
+            _completedCycles = Mathf.floorToInt(_totalElapsedTime / currentClip.totalDuration);
             _isLoopingBackOnPingPong = false;
+
 
             // handle ping pong loops. if loop is false but pingPongLoop is true we allow a single forward-then-backward iteration
             if (currentClip.PlayMode == PlayMode.PingPong)
             {
-                if (currentClip.PlayMode == PlayMode.Loop || _completedIterations < 2)
                     _isLoopingBackOnPingPong = _completedIterations % 2 != 0;
             }
 
 
             var elapsedTime = 0f;
-            if (_totalElapsedTime < currentClip.iterationDuration)
-            {
-                elapsedTime = _totalElapsedTime;
-            }
-            else
-            {
-                elapsedTime = _totalElapsedTime % currentClip.iterationDuration;
 
-                // if we arent looping and elapsedTime is 0 we are done. Handle it appropriately
-                if (currentClip.PlayMode != PlayMode.Loop && elapsedTime == 0)
+            elapsedTime = _totalElapsedTime % currentClip.iterationDuration;
+
+            // if we arent looping and elapsedTime is 0 we are done. Handle it appropriately
+            if (_totalElapsedTime == 0f || _completedIterations > currentClip.cycles)
+            {
+                // the animation is done so fire our event
+                //if (onAnimationCompletedEvent != null)
+                //    onAnimationCompletedEvent(_currentAnimationKey);
+
+                isPlaying = false;
+
+                switch (currentClip.completionBehavior)
                 {
-                    // the animation is done so fire our event
-                    //if (onAnimationCompletedEvent != null)
-                    //    onAnimationCompletedEvent(_currentAnimationKey);
-
-                    isPlaying = false;
-
-                    switch (currentClip.completionBehavior)
-                    {
-                        case AnimationCompletionBehavior.RemainOnFinalFrame:
-                            return;
-                        case AnimationCompletionBehavior.RevertToFirstFrame:
-                            currentFrame = currentClip.frames[0];
-                            //origin = _currentAnimation.frames[0].origin;
-                            return;
-                        case AnimationCompletionBehavior.HideSprite:
-                            //subtexture = null;
-                            //_currentAnimation = null;
-                            return;
-                    }
+                    case AnimationCompletionBehavior.RemainOnFinalFrame:
+                        return;
+                    case AnimationCompletionBehavior.RevertToFirstFrame:
+                        currentFrame = currentClip.frames[0];
+                        //origin = _currentAnimation.frames[0].origin;
+                        return;
+                    case AnimationCompletionBehavior.HideSprite:
+                        //subtexture = null;
+                        //_currentAnimation = null;
+                        return;
                 }
             }
+         
 
             // if we reversed the animation and we reached 0 total elapsed time handle un-reversing things and loop continuation
             if (_isReversed && _totalElapsedTime <= 0)
@@ -170,11 +169,18 @@ namespace Otiose2D.animation
             var desiredFrame = Mathf.floorToInt(elapsedTime / currentClip.secondsPerFrame);
             if (desiredFrame != currentFrame.spriteId)
             {
-                
+                Console.Write("from frame: " + currentFrame.spriteId);
                 currentFrame = currentClip.frames[desiredFrame];
+                Console.Write(" to   " + currentFrame.spriteId + "\n" );
+                _framesPlayed++;
+
+                if (_framesPlayed == currentClip.frames.Count)
+                    _completedIterations++;
+                    _framesPlayed = 0;
+
                 //subtexture = _currentAnimation.frames[currentFrame].subtexture;
                 //origin = _currentAnimation.frames[currentFrame].origin;
-                handleFrameChanged();
+                handleFrameChanged(currentFrame.spriteId);
 
                 // ping-pong needs special care. we don't want to double the frame time when wrapping so we man-handle the totalElapsedTime
                 if (currentClip.PlayMode == PlayMode.PingPong && (currentFrame.spriteId == 0 || currentFrame.spriteId == currentClip.frames.Count - 1))
@@ -187,10 +193,9 @@ namespace Otiose2D.animation
             }
         }
 
-        private void handleFrameChanged()
+        private void handleFrameChanged(int num)
         {
 
-                //Do the thing
 
         }
     }

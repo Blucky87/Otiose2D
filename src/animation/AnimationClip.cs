@@ -12,15 +12,15 @@ namespace Otiose2D.animation
         public List<AnimationFrame> frames;
         public Texture2D image;
         public PlayMode PlayMode = PlayMode.Loop;
-        public float fps = 10f;
+        private float _fps = 10f;
         public int animationStartFrame = 0;
         public int cycleStartFrame = 0;
         public float delay = 0f;
         public float totalDuration = 0f;
         private bool _hasBeenPreparedForUse = false;
+        public float iterationDuration { get; private set; }
         public float secondsPerFrame = 1.0f;
-        public float iterationDuration = 0;
-        public int cycles = Int32.MaxValue;
+        public int cycles = 1;
         public AnimationCompletionBehavior completionBehavior = AnimationCompletionBehavior.RevertToFirstFrame; 
 
         public AnimationClip(string text, Texture2D texture, List<AnimationFrame> animationFrames )
@@ -31,6 +31,13 @@ namespace Otiose2D.animation
             prepareForUse();
         }
 
+        public float fps
+        {
+            get { return _fps; }
+            set { _fps = value; prepareForUse(); }
+        }
+
+
         public void prepareForUse()
         {
             if (_hasBeenPreparedForUse)
@@ -39,7 +46,7 @@ namespace Otiose2D.animation
             secondsPerFrame = 1f / fps;
             iterationDuration = secondsPerFrame * (float)frames.Count;
 
-            if (cycles == Int32.MaxValue || PlayMode == PlayMode.RandomFrame || PlayMode == PlayMode.Single)
+            if (cycles == int.MaxValue || PlayMode == PlayMode.RandomFrame || PlayMode == PlayMode.Single)
                 totalDuration = float.PositiveInfinity;
             else if (PlayMode == PlayMode.Loop)
                 totalDuration = iterationDuration * cycles;

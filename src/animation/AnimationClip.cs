@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
+using Nez;
 
 namespace Otiose2D.animation
 {
@@ -20,7 +21,7 @@ namespace Otiose2D.animation
         private bool _hasBeenPreparedForUse = false;
         public float iterationDuration { get; private set; }
         public float secondsPerFrame = 1.0f;
-        public int cycles = 1;
+        public int cycles = int.MaxValue;
         public AnimationCompletionBehavior completionBehavior = AnimationCompletionBehavior.RevertToFirstFrame; 
 
         public AnimationClip(string text, Texture2D texture, List<AnimationFrame> animationFrames )
@@ -55,6 +56,20 @@ namespace Otiose2D.animation
             else
                 totalDuration = float.PositiveInfinity;
 
+
+            if (PlayMode == PlayMode.RandomFrame)
+            {
+                int randFrame = Nez.Random.range(0, frames.Count);
+
+                animationStartFrame = randFrame;
+            }
+
+            if (PlayMode == PlayMode.Once)
+            {
+                animationStartFrame = 0;
+                cycles = 1;
+            }
+
             _hasBeenPreparedForUse = true;
         }
 
@@ -83,6 +98,11 @@ namespace Otiose2D.animation
         /// Starts at a random frame and loops indefinitely from there. Useful for multiple animated sprites to start at a different phase.
         /// </summary>
         RandomLoop,
+
+        //<summary>
+        // Plays clip once through 
+        //</summary>
+        Once,
 
         /// <summary>
         /// Simply choses a random frame and stops

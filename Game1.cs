@@ -1,4 +1,5 @@
 ﻿using System.CodeDom;
+using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
 using Microsoft.Xna.Framework;
@@ -56,7 +57,7 @@ namespace Otiose2D
             AnimationClipManager animManager = new AnimationClipManager(clip);
             SpriteAnimator animator = new SpriteAnimator(animManager);
             //animator.currentClip = clip;
-            animator.currentFrame = animator.currentClip.frames[0];
+            //animator.currentFrame = animator.currentClip.frames[0];
             
             
             
@@ -65,6 +66,7 @@ namespace Otiose2D
             entity.addComponent(animator);
 
             entity.getComponent<SpriteAnimator>().play();
+
             entity.addComponent(new PlayerInputManager());
             
 
@@ -73,6 +75,8 @@ namespace Otiose2D
 
             base.Initialize();
         }
+
+
 
         protected override void Update(GameTime gametime) {
             InputManager.Update();

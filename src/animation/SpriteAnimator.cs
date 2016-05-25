@@ -22,6 +22,8 @@ namespace Otiose2D.animation
         bool _isLoopingBackOnPingPong;
         int _completedCycles;
         int _framesPlayed;
+        private bool built;
+
 
         public override float width
         {
@@ -37,6 +39,34 @@ namespace Otiose2D.animation
         {
             library = clips;
             currentClip = library.getDefault();
+            currentFrame = currentClip.frames[currentClip.animationStartFrame];
+        }
+
+        public void reset()
+        {
+            isPlaying = true;
+
+            currentClip.prepareForUse();
+            nextFrame = null;
+            previousFrame = null;
+            currentFrame = currentClip.frames[currentClip.animationStartFrame];
+        }
+
+        public void stop()
+        {
+            isPlaying = false;
+            _totalElapsedTime = 0;
+            _elapsedDelay = 0;
+            _isLoopingBackOnPingPong = false;
+            _completedCycles = 0;
+            _framesPlayed = 0;
+            _delayComplete = false;
+            currentFrame = currentClip.frames[currentClip.animationStartFrame];
+        }
+
+        public void pause()
+        {
+            isPlaying = false;
         }
 
         public void play()
@@ -47,11 +77,11 @@ namespace Otiose2D.animation
             }
 
             isPlaying = true;
-
         }
 
         public void play(string name)
         {
+            Assert.isTrue(library.);
             play( library.GetClip(name) );
         }
 
@@ -64,6 +94,7 @@ namespace Otiose2D.animation
         public void play(AnimationClip clip, float startTime)
         {
             currentClip = clip;
+            
             isPlaying = true;
         }
 
@@ -75,7 +106,7 @@ namespace Otiose2D.animation
         public void update()
         {
             
-            if (currentClip == null || !isPlaying)
+            if (currentClip == null || !isPlaying || currentClip.PlayMode == PlayMode.RandomFrame || currentClip.PlayMode == PlayMode.Single)
                 return;
 
             // handle delay
@@ -95,8 +126,10 @@ namespace Otiose2D.animation
             }
             else
             {
-                _totalElapsedTime += Time.deltaTime;
+               if(built)
+                    _totalElapsedTime += Time.deltaTime;
             }
+            built = true;
 
             _totalElapsedTime = Mathf.clamp(_totalElapsedTime, 0f, currentClip.totalDuration);
             _completedIterations = Mathf.floorToInt(_totalElapsedTime / currentClip.iterationDuration);
@@ -116,7 +149,7 @@ namespace Otiose2D.animation
             elapsedTime = _totalElapsedTime % currentClip.iterationDuration;
 
             // if we arent looping and elapsedTime is 0 we are done. Handle it appropriately
-            if (_totalElapsedTime == 0f || _completedIterations > currentClip.cycles)
+            if ((_totalElapsedTime == 0f && _isReversed) || _completedCycles > currentClip.cycles)
             {
                 // the animation is done so fire our event
                 //if (onAnimationCompletedEvent != null)
@@ -161,7 +194,7 @@ namespace Otiose2D.animation
             }
 
             // time goes backwards when we are reversing a ping-pong loop
-            if (_isLoopingBackOnPingPong)
+            if (_isLoopingBackOnPingPong )
                 elapsedTime = currentClip.iterationDuration - elapsedTime;
 
 
@@ -171,12 +204,14 @@ namespace Otiose2D.animation
             {
                 Console.Write("from frame: " + currentFrame.spriteId);
                 currentFrame = currentClip.frames[desiredFrame];
-                Console.Write(" to   " + currentFrame.spriteId + "\n" );
+                Console.Write(" to " + currentFrame.spriteId + "\n" );
                 _framesPlayed++;
 
                 if (_framesPlayed == currentClip.frames.Count)
+                {
                     _completedIterations++;
                     _framesPlayed = 0;
+                }
 
                 //subtexture = _currentAnimation.frames[currentFrame].subtexture;
                 //origin = _currentAnimation.frames[currentFrame].origin;
@@ -191,6 +226,8 @@ namespace Otiose2D.animation
                         _totalElapsedTime += currentClip.secondsPerFrame;
                 }
             }
+
+
         }
 
         private void handleFrameChanged(int num)

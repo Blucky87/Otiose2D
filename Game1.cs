@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Nez;
@@ -38,22 +39,27 @@ namespace Otiose2D
             // create our Scene with the DefaultRenderer and a clear color of CornflowerBlue
             var myScene = Scene.createWithDefaultRenderer(Color.CornflowerBlue);
 
-            Texture2D img = myScene.contentManager.Load<Texture2D>("DownBreathing");
-            Entity entity = myScene.createEntity("first-sprite");
+            Texture2D img = myScene.contentManager.Load<Texture2D>("Up_Idle_Breathe");
+            AnimationClip clip = new AnimationClip("idle", img, new List<AnimationFrame>()
+            {
+                new AnimationFrame( new Rectangle( 0, 0, 64, 64 ), 0 ),
+                new AnimationFrame( new Rectangle( 64, 0, 64, 64 ), 0 ),
+                new AnimationFrame( new Rectangle( 128, 0, 64, 64 ), 0 ),
+                new AnimationFrame( new Rectangle( 192, 0, 64, 64 ), 0 ),
+            });
+            Texture2D img2 = myScene.contentManager.Load<Texture2D>("Down_Idle_Breathe");
+            AnimationClip clip2 = new AnimationClip("idle", img2, new List<AnimationFrame>()
+            {
+                new AnimationFrame( new Rectangle( 0, 0, 64, 64 ), 0 ),
+                new AnimationFrame( new Rectangle( 64, 0, 64, 64 ), 0 ),
+                new AnimationFrame( new Rectangle( 128, 0, 64, 64 ), 0 ),
+                new AnimationFrame( new Rectangle( 192, 0, 64, 64 ), 0 ),
+            });
 
-            Rectangle rect = new Rectangle(0,0,64,64);
-            Rectangle rect2 = new Rectangle(64, 0, 64, 64);
-            Rectangle rect3 = new Rectangle(128, 0, 64, 64);
-            Rectangle rect4 = new Rectangle(192, 0, 64, 64);
+            var animtest = myScene.contentManager.Load<AnimationClip>("ParticleSystemSettings/XmlFileName");
+            particleType.loadParticleTexture( contentManager );
             
-            List<AnimationFrame> theframes = new List<AnimationFrame>();
-            theframes.Add(new AnimationFrame( rect, 0));
-            theframes.Add(new AnimationFrame( rect2, 1));
-            theframes.Add(new AnimationFrame( rect3, 2));
-            theframes.Add(new AnimationFrame( rect4, 3));
-
-            AnimationClip clip = new AnimationClip("test", img, theframes );
-
+            Entity entity = myScene.createEntity("first-sprite");
             AnimationClipManager animManager = new AnimationClipManager(clip);
             SpriteAnimator animator = new SpriteAnimator(animManager);
             //animator.currentClip = clip;
@@ -76,7 +82,14 @@ namespace Otiose2D
             base.Initialize();
         }
 
-
+        [ContentProcessor(DisplayName = "Anim System Settings Processor")]
+        public class ParticleSystemSettingsProcessor : ContentProcessor<AnimationClip, AnimationClip>
+        {
+            public override AnimationClip Process(AnimationClip input, ContentProcessorContext context)
+            {
+                return input;
+            }
+        }
 
         protected override void Update(GameTime gametime) {
             InputManager.Update();

@@ -122,6 +122,9 @@
     <Compile Include="src\input\system\XInputDeviceManager.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="MonoGame.Framework.Content.Pipeline">
+      <HintPath>Dependencies\Nez\packages\MonoGame.Framework.Content.Pipeline.Portable.3.2.99.1-Beta\lib\portable-net45+win+wpa81+Xamarin.iOS10+MonoAndroid10+MonoTouch10\MonoGame.Framework.Content.Pipeline.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK">
       <HintPath>Dependencies\MonoGame\ThirdParty\Dependencies\OpenTK.dll</HintPath>
     </Reference>

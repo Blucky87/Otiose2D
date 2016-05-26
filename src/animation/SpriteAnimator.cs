@@ -81,7 +81,7 @@ namespace Otiose2D.animation
 
         public void play(string name)
         {
-            Assert.isTrue(library.);
+            
             play( library.GetClip(name) );
         }
 

@@ -34,7 +34,6 @@ namespace Nez
 		/// </summary>
 		public static Material defaultOpaqueMaterial = new Material( BlendState.Opaque );
 
-
 		/// <summary>
 		/// BlendState used by the Batcher for the current RenderableComponent
 		/// </summary>
@@ -129,6 +128,7 @@ namespace Nez
 
 		public static Material blendMultiply()
 		{
+			// works only for opaque textures
 			return new Material {
 				blendState = new BlendState {
 					ColorSourceBlend = Blend.DestinationColor,

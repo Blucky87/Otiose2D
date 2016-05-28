@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -50,16 +50,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Tiled\" />
-    <Folder Include="BitmapFonts\" />
-    <Folder Include="TexturePacker\" />
-    <Folder Include="TextureAtlasGenerator\" />
-    <Folder Include="XMLTemplateMaker\" />
-    <Folder Include="ParticleDesigner\" />
-    <Folder Include="ParticleDesigner\ConversionTypes\" />
-    <Folder Include="Overlap2D\VOs\NotImplemented\" />
-    <Folder Include="UISkin\" />
-    <Folder Include="Common\" />
+    <ProjectReference Include="..\Nez-PCL\Nez.csproj">
+      <Project>{60b7197d-d0d5-405c-90a2-a56903e9b039}</Project>
+      <Name>Nez</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Tiled\TiledMapImporter.cs" />
@@ -160,11 +154,5 @@
     <Compile Include="UISkin\UISkinImporter.cs" />
     <Compile Include="Common\PathHelper.cs" />
     <Compile Include="Common\ContentWriterExt.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Nez-PCL\Nez.csproj">
-      <Project>{60B7197D-D0D5-405C-90A2-A56903E9B039}</Project>
-      <Name>Nez</Name>
-    </ProjectReference>
   </ItemGroup>
 </Project>

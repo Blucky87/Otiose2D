@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Input;
 using Nez;
 using Nez.Sprites;
 using Nez.Textures;
-using Otiose2D.animation;
+
 using Otiose2D.Input.Setup;
 
 
@@ -47,7 +47,8 @@ namespace Otiose2D
                 new AnimationFrame( new Rectangle( 128, 0, 64, 64 ), 0 ),
                 new AnimationFrame( new Rectangle( 192, 0, 64, 64 ), 0 ),
             });
-            Texture2D img2 = myScene.contentManager.Load<Texture2D>("Down_Idle_Breathe");
+            Texture2D img2 = myScene.contentManager.Load<Texture2D>("DownLeft_Idle_Breathe");
+
             AnimationClip clip2 = new AnimationClip("idle", img2, new List<AnimationFrame>()
             {
                 new AnimationFrame( new Rectangle( 0, 0, 64, 64 ), 0 ),
@@ -56,8 +57,7 @@ namespace Otiose2D
                 new AnimationFrame( new Rectangle( 192, 0, 64, 64 ), 0 ),
             });
 
-            var animtest = myScene.contentManager.Load<AnimationClip>("ParticleSystemSettings/XmlFileName");
-            particleType.loadParticleTexture( contentManager );
+
             
             Entity entity = myScene.createEntity("first-sprite");
             AnimationClipManager animManager = new AnimationClipManager(clip);
@@ -67,7 +67,7 @@ namespace Otiose2D
             
             
             
-            entity.transform.position = new Vector2(300,300);
+            entity.transform.position = new Vector2( 300, 300 );
 
             entity.addComponent(animator);
 
@@ -82,14 +82,6 @@ namespace Otiose2D
             base.Initialize();
         }
 
-        [ContentProcessor(DisplayName = "Anim System Settings Processor")]
-        public class ParticleSystemSettingsProcessor : ContentProcessor<AnimationClip, AnimationClip>
-        {
-            public override AnimationClip Process(AnimationClip input, ContentProcessorContext context)
-            {
-                return input;
-            }
-        }
 
         protected override void Update(GameTime gametime) {
             InputManager.Update();

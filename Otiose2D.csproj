@@ -44,10 +44,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="scenes\testscene.cs" />
-    <Compile Include="src\animation\AnimationClipManager.cs" />
-    <Compile Include="src\animation\AnimationClip.cs" />
-    <Compile Include="src\animation\AnimationFrame.cs" />
-    <Compile Include="src\animation\SpriteAnimator.cs" />
     <Compile Include="src\ecs\PlayerInputManager.cs" />
     <Compile Include="src\input\setup\Action1IsPressed.cs" />
     <Compile Include="src\input\setup\Action1WasPressed.cs" />

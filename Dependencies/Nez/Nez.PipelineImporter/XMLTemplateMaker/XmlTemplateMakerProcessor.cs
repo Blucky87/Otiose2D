@@ -45,8 +45,11 @@ namespace Nez.XmlTemplateMaker
 				context.Logger.LogMessage( "checking assembly: {0}...", assembly.GetName().Name );
 				foreach( var type in assembly.GetTypes() )
 				{
+                    if(assembly.GetName().Name.Equals("Nez"))
+                        context.Logger.LogMessage("--" + type.FullName);
 					if( type.FullName == inputClass )
 						return type;
+                   
 				}
 			}
 

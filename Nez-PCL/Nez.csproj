@@ -416,6 +416,9 @@
     <Compile Include="Utils\Fonts\BatcherIFontExt.cs" />
     <Compile Include="Utils\Fonts\BatcherBitmapFontExt.cs" />
     <Compile Include="Utils\Fonts\BatcherSpriteFontExt.cs" />
+    <Compile Include="Graphics\Transitions\TextureWipeTransition.cs" />
+    <Compile Include="Graphics\Textures\GaussianBlur.cs" />
+    <Compile Include="Graphics\Textures\TextureUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

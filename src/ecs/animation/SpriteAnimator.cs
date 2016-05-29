@@ -1,7 +1,7 @@
 ﻿using System;
 using Nez;
 
-namespace Otiose2D.animation
+namespace Nez.Sprites
 {
     public class SpriteAnimator : RenderableComponent, IUpdatable
     {
@@ -202,9 +202,9 @@ namespace Otiose2D.animation
             var desiredFrame = Mathf.floorToInt(elapsedTime / currentClip.secondsPerFrame);
             if (desiredFrame != currentFrame.spriteId)
             {
-                Console.Write("from frame: " + currentFrame.spriteId);
+                //Console.Write("from frame: " + currentFrame.spriteId);
                 currentFrame = currentClip.frames[desiredFrame];
-                Console.Write(" to " + currentFrame.spriteId + "\n" );
+                //Console.Write(" to " + currentFrame.spriteId + "\n" );
                 _framesPlayed++;
 
                 if (_framesPlayed == currentClip.frames.Count)

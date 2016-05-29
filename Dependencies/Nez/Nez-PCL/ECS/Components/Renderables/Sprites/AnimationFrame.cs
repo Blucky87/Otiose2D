@@ -4,12 +4,14 @@ namespace Nez.Sprites
 {
     public class AnimationFrame
     {
+        public string sourceImage;
         public Rectangle sourceRect;
         public int spriteId;
 
 
-        public AnimationFrame(Rectangle rect, int id)
+        public AnimationFrame(string source, Rectangle rect, int id)
         {
+            sourceImage = source;
             sourceRect = rect;
             spriteId = id;
         }

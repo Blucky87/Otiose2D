@@ -1,17 +1,17 @@
-
-
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Nez;
 
-namespace Otiose2D.animation
+namespace Nez.Sprites
 {
     public class AnimationClip
     {
-        public string name = "Default";
-        public List<AnimationFrame> frames;
-        public Texture2D image;
+        public string name = "Default Animation Name";
+        public List<AnimationFrame> frames = new List<AnimationFrame>();
+        public Dictionary<string, Texture2D> sourceImage;
+
         public PlayMode PlayMode = PlayMode.Loop;
         private float _fps = 10f;
         public int animationStartFrame = 0;
@@ -26,9 +26,12 @@ namespace Otiose2D.animation
 
         public AnimationClip(string text, Texture2D texture, List<AnimationFrame> animationFrames )
         {
-            name = text;
-            image = texture;
-            frames = animationFrames;
+            prepareForUse();
+        }
+
+        public AnimationClip()
+        {
+            
             prepareForUse();
         }
 
@@ -74,44 +77,27 @@ namespace Otiose2D.animation
         }
 
     }
-
+/*
     public enum AnimationCompletionBehavior
     {
         RemainOnFinalFrame,
         RevertToFirstFrame,
         HideSprite
     }
-
+*/
     public enum PlayMode
     {
-        /// <summary>
-        /// Loop indefinitely
-        /// </summary>
+
         Loop,
 
-        /// <summary>
-        /// Plays the clip once forward, and then once in reverse, repeating indefinitely
-        /// </summary>
         PingPong,
 
-        /// <summary>
-        /// Starts at a random frame and loops indefinitely from there. Useful for multiple animated sprites to start at a different phase.
-        /// </summary>
         RandomLoop,
 
-        //<summary>
-        // Plays clip once through 
-        //</summary>
         Once,
 
-        /// <summary>
-        /// Simply choses a random frame and stops
-        /// </summary>
         RandomFrame,
 
-        /// <summary>
-        /// Switches to the selected sprite and stops.
-        /// </summary>
         Single
     };
 }

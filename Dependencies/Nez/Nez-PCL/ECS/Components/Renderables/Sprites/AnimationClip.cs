@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
@@ -10,16 +8,10 @@ namespace Nez.Sprites
 {
     public class AnimationClip
     {
-        public string name = "Default";
-        public List<AnimationFrame> frames = new List<AnimationFrame>()
-        {
-                new AnimationFrame( new Rectangle( 0, 0, 64, 64 ), 0 ),
-                new AnimationFrame( new Rectangle( 64, 0, 64, 64 ), 0 ),
-                new AnimationFrame( new Rectangle( 128, 0, 64, 64 ), 0 ),
-                new AnimationFrame( new Rectangle( 192, 0, 64, 64 ), 0 ),
-        };
+        public string name = "Default Animation Name";
+        public List<AnimationFrame> frames = new List<AnimationFrame>();
+        public Dictionary<string, Texture2D> sourceImage;
 
-        public Texture2D image;// = Core.scene.contentManager.Load<Texture2D>("Up_Idle_Breathe");
         public PlayMode PlayMode = PlayMode.Loop;
         private float _fps = 10f;
         public int animationStartFrame = 0;
@@ -34,15 +26,12 @@ namespace Nez.Sprites
 
         public AnimationClip(string text, Texture2D texture, List<AnimationFrame> animationFrames )
         {
-            name = text;
-            image = texture;
-            frames = animationFrames;
             prepareForUse();
         }
 
         public AnimationClip()
         {
-            //image = Core.scene.contentManager.Load<Texture2D>("Up_Idle_Breathe");
+            
             prepareForUse();
         }
 
@@ -95,37 +84,20 @@ namespace Nez.Sprites
         RevertToFirstFrame,
         HideSprite
     }
-    */
+*/
     public enum PlayMode
     {
-        /// <summary>
-        /// Loop indefinitely
-        /// </summary>
+
         Loop,
 
-        /// <summary>
-        /// Plays the clip once forward, and then once in reverse, repeating indefinitely
-        /// </summary>
         PingPong,
 
-        /// <summary>
-        /// Starts at a random frame and loops indefinitely from there. Useful for multiple animated sprites to start at a different phase.
-        /// </summary>
         RandomLoop,
 
-        //<summary>
-        // Plays clip once through 
-        //</summary>
         Once,
 
-        /// <summary>
-        /// Simply choses a random frame and stops
-        /// </summary>
         RandomFrame,
 
-        /// <summary>
-        /// Switches to the selected sprite and stops.
-        /// </summary>
         Single
     };
 }

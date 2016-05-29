@@ -305,8 +305,3 @@
 /processorParam:TextureFormat=Color
 /build:UpRight_Locomotion_Walk.png
 
-#begin AnimationClip.xml
-/importer:XmlImporter
-/processor:XmlTemplateMakerProcessor
-/build:AnimationClip.xml
-

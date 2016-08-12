@@ -1,7 +1,7 @@
 ﻿using System;
 using Nez;
 
-namespace Nez.Sprites
+namespace Otiose2D.Sprites
 {
     public class SpriteAnimator : RenderableComponent, IUpdatable
     {
@@ -23,7 +23,6 @@ namespace Nez.Sprites
         int _completedCycles;
         int _framesPlayed;
         private bool built;
-
 
         public override float width
         {

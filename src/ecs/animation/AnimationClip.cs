@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Nez;
+using Nez.Sprites;
 
-namespace Nez.Sprites
+namespace Otiose2D.Sprites
 {
     public class AnimationClip
     {
         public string name = "Default Animation Name";
-        public List<AnimationFrame> frames = new List<AnimationFrame>();
-        public Dictionary<string, Texture2D> sourceImage;
+        public List<AnimationFrame> frames;
+        public List<Texture2D> images;
 
         public PlayMode PlayMode = PlayMode.Loop;
         private float _fps = 10f;

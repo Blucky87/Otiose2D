@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-namespace Nez.Sprites
+namespace Otiose2D.Sprites
 {
     public class AnimationClipManager
     {

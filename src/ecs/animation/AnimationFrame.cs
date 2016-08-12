@@ -1,6 +1,6 @@
 using Microsoft.Xna.Framework;
 
-namespace Nez.Sprites
+namespace Otiose2D.Sprites
 {
     public class AnimationFrame
     {

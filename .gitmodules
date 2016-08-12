@@ -1,0 +1,9 @@
+[submodule "Dependencies/monogame/ThirdParty/Kickstart"]
+	path = Dependencies/monogame/ThirdParty/Kickstart
+	url = https://github.com/OutOfOrder/MonoKickstart.git
+[submodule "Dependencies/monogame/ThirdParty/Dependencies"]
+	path = Dependencies/monogame/ThirdParty/Dependencies
+	url = https://github.com/Mono-Game/MonoGame.Dependencies.git
+[submodule "Dependencies/monogame/ThirdParty/NVorbis"]
+	path = Dependencies/monogame/ThirdParty/NVorbis
+	url = https://github.com/ioctlLR/NVorbis.git

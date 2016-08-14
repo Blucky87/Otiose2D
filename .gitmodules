@@ -1,9 +1,9 @@
-[submodule "Dependencies/monogame/ThirdParty/Kickstart"]
-	path = Dependencies/monogame/ThirdParty/Kickstart
+[submodule "src/libs/MonoGame/ThirdParty/Kickstart"]
+	path = src/libs/MonoGame/ThirdParty/Kickstart
 	url = https://github.com/OutOfOrder/MonoKickstart.git
-[submodule "Dependencies/monogame/ThirdParty/Dependencies"]
-	path = Dependencies/monogame/ThirdParty/Dependencies
+[submodule "src/libs/MonoGame/ThirdParty/Dependencies"]
+	path = src/libs/MonoGame/ThirdParty/Dependencies
 	url = https://github.com/Mono-Game/MonoGame.Dependencies.git
-[submodule "Dependencies/monogame/ThirdParty/NVorbis"]
-	path = Dependencies/monogame/ThirdParty/NVorbis
+[submodule "src/libs/MonoGame/ThirdParty/NVorbis"]
+	path = src/libs/MonoGame/ThirdParty/NVorbis
 	url = https://github.com/ioctlLR/NVorbis.git

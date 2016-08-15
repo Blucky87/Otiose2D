@@ -99,7 +99,7 @@ namespace Otiose2D.Sprites
 
         public override void render(Graphics graphics, Camera camera)
         {
-            graphics.batcher.draw(currentClip.image, entity.transform.position + localOffset, currentFrame.sourceRect, color, entity.transform.rotation, origin, entity.transform.scale, spriteEffects, _layerDepth);
+//            graphics.batcher.draw(currentClip.image, entity.transform.position + localOffset, currentFrame.sourceRect, color, entity.transform.rotation, origin, entity.transform.scale, spriteEffects, _layerDepth);
         }
 
         public void update()
@@ -158,16 +158,16 @@ namespace Otiose2D.Sprites
 
                 switch (currentClip.completionBehavior)
                 {
-                    case AnimationCompletionBehavior.RemainOnFinalFrame:
-                        return;
-                    case AnimationCompletionBehavior.RevertToFirstFrame:
-                        currentFrame = currentClip.frames[0];
-                        //origin = _currentAnimation.frames[0].origin;
-                        return;
-                    case AnimationCompletionBehavior.HideSprite:
-                        //subtexture = null;
-                        //_currentAnimation = null;
-                        return;
+//                    case AnimationCompletionBehavior.RemainOnFinalFrame:
+//                        return;
+//                    case AnimationCompletionBehavior.RevertToFirstFrame:
+//                        currentFrame = currentClip.frames[0];
+//                        //origin = _currentAnimation.frames[0].origin;
+//                        return;
+//                    case AnimationCompletionBehavior.HideSprite:
+//                        //subtexture = null;
+//                        //_currentAnimation = null;
+//                        return;
                 }
             }
          

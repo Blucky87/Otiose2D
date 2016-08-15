@@ -10,10 +10,10 @@
 
 #-------------------------------- References --------------------------------#
 
-/reference:../Dependencies/Nez/Nez.PipelineImporter/bin/Debug/Newtonsoft.Json.dll
-/reference:../Dependencies/Nez/Nez.PipelineImporter/bin/Debug/Nez.PipelineImporter.dll
-/reference:../Dependencies/Nez/Nez.PipelineImporter/bin/Debug/Ionic.ZLib.dll
-/reference:../Dependencies/Nez/Nez-PCL/bin/Debug/nez.dll
+/reference:../src/libs/Nez/Nez.PipelineImporter/bin/Debug/Newtonsoft.Json.dll
+/reference:../src/libs/Nez/Nez.PipelineImporter/bin/Debug/Nez.PipelineImporter.dll
+/reference:../src/libs/Nez/Nez.PipelineImporter/bin/Debug/Ionic.ZLib.dll
+/reference:../src/libs/Nez/Nez-PCL/bin/Debug/nez.dll
 
 #---------------------------------- Content ---------------------------------#
 
@@ -304,4 +304,3 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:UpRight_Locomotion_Walk.png
-

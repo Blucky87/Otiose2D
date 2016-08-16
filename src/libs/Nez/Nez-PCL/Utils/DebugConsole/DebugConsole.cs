@@ -579,7 +579,7 @@ namespace Nez.Console
 
 			// this will get us the current executables assembly in 99.9% of cases
 			// for now we will let the next section handle loading this. If it doesnt work out we'll uncomment this
-			//processAssembly( Core._instance.GetType().GetTypeInfo().Assembly );
+			processAssembly( Core._instance.GetType().GetTypeInfo().Assembly );
 
 			try
 			{

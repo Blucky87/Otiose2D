@@ -63,7 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SpriterDotNet.MonoGame\SpriterDotNet.MonoGame.csproj">
-      <Project>{10C1ED31-6945-4617-85AD-D2575550149D}</Project>
+      <Project>{10c1ed31-6945-4617-85ad-d2575550149d}</Project>
       <Name>SpriterDotNet.MonoGame</Name>
     </ProjectReference>
   </ItemGroup>

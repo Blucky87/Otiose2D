@@ -1,13 +1,20 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Nez;
-using Nez.Sprites;
+using Nez.SpriterAnimator;
 using Nez.Textures;
 
 using Otiose2D.Input.Setup;
+using Sprite = Nez.SpriterAnimator.Sprite;
+using SpriterAnimator = Nez.Sprites.SpriterAnimator;
+using onfig = Nez.SpriterAnimator.Config;
+using Nez.Sprites;
+using Otiose2D.Sprites;
 
 
 namespace Otiose2D
@@ -26,7 +33,9 @@ namespace Otiose2D
         Scene otherScene;
         protected override void Initialize()
         {
-            InputManager.Setup();
+
+          Config config = new Config();
+          InputManager.Setup();
 
             Window.ClientSizeChanged += Core.onClientSizeChanged;
 
@@ -36,43 +45,20 @@ namespace Otiose2D
             // create our Scene with the DefaultRenderer and a clear color of CornflowerBlue
             var myScene = Scene.createWithDefaultRenderer(Color.CornflowerBlue);
 
-//            Texture2D img = myScene.contentManager.Load<Texture2D>("Up_Idle_Breathe");
-//            AnimationClip clip = new AnimationClip("idle", img, new List<AnimationFrame>()
-//            {
-//                new AnimationFrame( new Rectangle( 0, 0, 64, 64 ), 0 ),
-//                new AnimationFrame( new Rectangle( 64, 0, 64, 64 ), 0 ),
-//                new AnimationFrame( new Rectangle( 128, 0, 64, 64 ), 0 ),
-//                new AnimationFrame( new Rectangle( 192, 0, 64, 64 ), 0 ),
-//            });
-//            Texture2D img2 = myScene.contentManager.Load<Texture2D>("DownLeft_Idle_Breathe");
-
-//            AnimationClip clip2 = new AnimationClip("idle", img2, new List<AnimationFrame>()
-//            {
-//                new AnimationFrame( new Rectangle( 0, 0, 64, 64 ), 0 ),
-//                new AnimationFrame( new Rectangle( 64, 0, 64, 64 ), 0 ),
-//                new AnimationFrame( new Rectangle( 128, 0, 64, 64 ), 0 ),
-//                new AnimationFrame( new Rectangle( 192, 0, 64, 64 ), 0 ),
-//            });
+            DefaultProviderFactory<Sprite, SoundEffect> factory = new DefaultProviderFactory<Sprite, SoundEffect>(config, true);
 
 
-            
-            Entity entity = myScene.createEntity("first-sprite");
-//            AnimationClipManager animManager = new AnimationClipManager(clip);
-//            SpriteAnimator animator = new SpriteAnimator(animManager);
-            //animator.currentClip = clip;
-            //animator.currentFrame = animator.currentClip.frames[0];
-            
-            
-            
+          Entity entity = myScene.createEntity("Entity1");
             entity.transform.position = new Vector2( 300, 300 );
 
-            //entity.addComponent(animator);
+          string scmlpath = "GreyGuy/player";
+          SpriterContentLoader loader = new SpriterContentLoader(myScene.content, scmlpath);
+          loader.Fill(factory);
 
-//            entity.getComponent<SpriteAnimator>().play();
-
-            entity.addComponent(new PlayerInputManager());
+          entity.addComponent(new PlayerInputManager());
+          entity.addComponent(new SpriterAnimator(loader.Spriter.Entities[0], factory));
             
-
+          //entity.getComponent<SpriteAnimator>().play("walk");
             // set the scene so Nez can take over
             Core.scene = myScene;
 
@@ -82,10 +68,10 @@ namespace Otiose2D
 
         protected override void Update(GameTime gametime) {
             InputManager.Update();
-           
-            if(Nez.Input.isKeyDown(Keys.Escape))
+          if(Nez.Input.currentKeyboardState.IsKeyDown(Keys.A))
             {
-                
+                Core.scene.entities.findEntity("Entity1").getComponent<SpriterAnimator>().animator.Play("walk");
+
             }
 
 /*            if(Input.isKeyDown(Keys.A)) {

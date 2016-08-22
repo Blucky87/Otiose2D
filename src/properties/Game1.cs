@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Nez;
+using Nez.Console;
 using Nez.SpriterAnimator;
 using Nez.Textures;
 
@@ -34,14 +35,12 @@ namespace Otiose2D
         protected override void Initialize()
         {
 
-          Config config = new Config();
-          InputManager.Setup();
+              Config config = new Config();
 
             Window.ClientSizeChanged += Core.onClientSizeChanged;
 
-            //Window.AllowUserResizing = true;
+            Window.AllowUserResizing = true;
 
-            otherScene = Scene.createWithDefaultRenderer(Color.CornflowerBlue);
             // create our Scene with the DefaultRenderer and a clear color of CornflowerBlue
             var myScene = Scene.createWithDefaultRenderer(Color.CornflowerBlue);
 
@@ -67,12 +66,16 @@ namespace Otiose2D
 
 
         protected override void Update(GameTime gametime) {
-            InputManager.Update();
+           // InputManager.Update();
           if(Nez.Input.currentKeyboardState.IsKeyDown(Keys.A))
             {
                 Core.scene.entities.findEntity("Entity1").getComponent<SpriterAnimator>().animator.Play("walk");
-
+                Core.scene.entities.findEntity("Entity1").transform.position += new Vector2(10,0);
             }
+          if (Nez.Input.leftMouseButtonDown)
+          {
+            Console.WriteLine(Nez.Input.scaledMousePosition);
+          }
 
 /*            if(Input.isKeyDown(Keys.A)) {
                 var img2 = otherScene.contentManager.Load<Texture2D>("DownBreathing");

@@ -195,7 +195,7 @@ namespace Nez.Spatial
 			if( cellCount > 0 )
 			{
 				var textPosition = new Vector2( (float)x * (float)_cellSize + 0.5f * _cellSize, (float)y * (float)_cellSize + 0.5f * _cellSize );
-				Debug.drawText( Graphics.instance.bitmapFont, cellCount.ToString(), textPosition, Color.DarkGreen, secondsToDisplay, textScale );
+				Debug.drawText( Graphics.instance.bitmapFont, cellCount.ToString(), textPosition, Color.Yellow, secondsToDisplay, textScale );
 			}
 		}
 

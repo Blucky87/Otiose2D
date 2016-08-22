@@ -62,9 +62,11 @@
     <Compile Include="Physics\Physics.cs" />
     <Compile Include="Physics\Ray2D.cs" />
     <Compile Include="Physics\SpatialHash.cs" />
-    <Compile Include="PipelineRuntime\Spriter\files\SpriterAnimator.cs" />
+    <Compile Include="PipelineRuntime\Spriter\files\MonoGameAnimator.cs" />
+    <Compile Include="PipelineRuntime\Spriter\files\MonoGameDebugAnimator.cs" />
     <Compile Include="PipelineRuntime\Spriter\files\Sprite.cs" />
     <Compile Include="PipelineRuntime\Spriter\files\SpriterContentLoader.cs" />
+    <Compile Include="PipelineRuntime\Spriter\files\TextureUtil.cs" />
     <Compile Include="PipelineRuntime\Spriter\SpriterAtlasTypeReader.cs" />
     <Compile Include="PipelineRuntime\Spriter\SpriterDotNet\Animator.cs" />
     <Compile Include="PipelineRuntime\Spriter\SpriterDotNet\AtlasDataModel.cs" />

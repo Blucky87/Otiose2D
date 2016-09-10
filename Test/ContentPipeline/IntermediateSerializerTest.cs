@@ -32,13 +32,10 @@ namespace MonoGame.Tests.ContentPipeline
             class FakeGraphicsService : IGraphicsDeviceService
             {
                 public GraphicsDevice GraphicsDevice { get; private set; }
-
-                #pragma warning disable 67
                 public event EventHandler<EventArgs> DeviceCreated;
                 public event EventHandler<EventArgs> DeviceDisposing;
                 public event EventHandler<EventArgs> DeviceReset;
                 public event EventHandler<EventArgs> DeviceResetting;
-                #pragma warning restore 67
             }
 
             class FakeServiceProvider : IServiceProvider
@@ -75,8 +72,8 @@ namespace MonoGame.Tests.ContentPipeline
 
             // Normalize line endings - git on build server seems to set
             // core.autocrlf to false.
-            expectedXml = expectedXml.Replace("\r\n", "\n");
-            actualXml = actualXml.Replace("\r\n", "\n");
+            expectedXml = expectedXml.Replace(Environment.NewLine, "\n");
+            actualXml = actualXml.Replace(Environment.NewLine, "\n");
 
             Assert.AreEqual(expectedXml, actualXml);
         }
@@ -175,11 +172,7 @@ namespace MonoGame.Tests.ContentPipeline
             {
                 a = null,
                 b = null,
-                c = string.Empty,
-                d = null,
-                e = CullMode.CullClockwiseFace,
-                f = CullMode.CullCounterClockwiseFace,
-                g = CullMode.CullClockwiseFace
+                c = string.Empty
             });
         }
 
@@ -209,9 +202,7 @@ namespace MonoGame.Tests.ContentPipeline
                     new Color(0x91, 0x6B, 0x46, 0xFF),
                     new Color(0x91, 0x7B, 0x46, 0xFF),
                     new Color(0x88, 0x65, 0x43, 0xFF)
-                },
-                CustomItemList = new List<CustomItem>(),
-                CustomItemInheritedList = new List<CustomItemInherited>()
+                }
             });
         }
 
@@ -463,35 +454,7 @@ namespace MonoGame.Tests.ContentPipeline
             SerializeAndAssert("24_GenericTypes.xml", new GenericTypes
             {
                 A = new GenericClass<int> { Value = 3 },
-                B = new GenericClass<float> { Value = 4.2f },
-                C = new GenericClass<GenericArg> { Value = new GenericArg { Value = 5 } }
-            });
-        }
-
-        [Test]
-        public void ChildCollections()
-        {
-            SerializeAndAssert("26_ChildCollections.xml", new ChildCollections
-            {
-                Children =
-                {
-                    new ChildCollectionChild { Name = "Foo" },
-                    new ChildCollectionChild { Name = "Bar" }
-                }
-            });
-        }
-
-        [Test]
-        public void Colors()
-        {
-            SerializeAndAssert("27_Colors.xml", new Colors()
-            {
-                White = Color.White,
-                Black = Color.Black,
-                Transparent = Color.Transparent,
-                Red = Color.Red,
-                Green = Color.Green,
-                Blue = Color.Blue
+                B = new GenericClass<float> { Value = 4.2f }
             });
         }
     }

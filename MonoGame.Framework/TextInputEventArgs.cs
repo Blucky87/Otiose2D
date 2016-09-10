@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using Microsoft.Xna.Framework.Input;
 
 namespace Microsoft.Xna.Framework
 {
@@ -13,10 +12,9 @@ namespace Microsoft.Xna.Framework
     public class TextInputEventArgs : EventArgs
     {
         char character;
-        public TextInputEventArgs(char character, Keys key = Keys.None)
+        public TextInputEventArgs(char character)
         {
             this.character = character;
-            this.Key = key;
         }
         public char Character
         {
@@ -24,9 +22,6 @@ namespace Microsoft.Xna.Framework
             {
                 return character;
             }
-        }
-        public Keys Key {
-            get; private set;
         }
     }
 }

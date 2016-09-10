@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -45,15 +44,14 @@ namespace Microsoft.Xna.Framework.Graphics
         private Rectangle _scissorRectangle;
         private bool _scissorRectangleDirty;
 
-        private VertexBufferBindings _vertexBuffers;
-        private bool _vertexBuffersDirty;
+        private VertexBuffer _vertexBuffer;
+        private bool _vertexBufferDirty;
 
         private IndexBuffer _indexBuffer;
         private bool _indexBufferDirty;
 
         private readonly RenderTargetBinding[] _currentRenderTargetBindings = new RenderTargetBinding[4];
         private int _currentRenderTargetCount;
-        private readonly RenderTargetBinding[] _tempRenderTargetBinding = new RenderTargetBinding[1];
 
         internal GraphicsCapabilities GraphicsCapabilities { get; private set; }
 
@@ -128,7 +126,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 Disposing != null;
         }
 
-        private int _maxVertexBufferSlots;
         internal int MaxTextureSlots;
         internal int MaxVertexTextureSlots;
 
@@ -161,14 +158,6 @@ namespace Microsoft.Xna.Framework.Graphics
             get;
             private set;
         }
-
-        internal GraphicsMetrics _graphicsMetrics;
-
-        /// <summary>
-        /// The rendering information for debugging and profiling.
-        /// The metrics are reset every frame after draw within <see cref="GraphicsDevice.Present"/>. 
-        /// </summary>
-        public GraphicsMetrics Metrics { get { return _graphicsMetrics; } set { _graphicsMetrics = value; } }
 
         internal GraphicsDevice(GraphicsDeviceInformation gdi)
         {
@@ -220,10 +209,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             PlatformSetup();
 
-            VertexTextures = new TextureCollection(this, MaxVertexTextureSlots, true);
+            VertexTextures = new TextureCollection(MaxVertexTextureSlots, true);
             VertexSamplerStates = new SamplerStateCollection(this, MaxVertexTextureSlots, true);
 
-            Textures = new TextureCollection(this, MaxTextureSlots, false);
+            Textures = new TextureCollection(MaxTextureSlots, false);
             SamplerStates = new SamplerStateCollection(this, MaxTextureSlots, false);
 
             _blendStateAdditive = BlendState.Additive.Clone();
@@ -275,9 +264,8 @@ namespace Microsoft.Xna.Framework.Graphics
             _pixelConstantBuffers.Clear();
 
             // Force set the buffers and shaders on next ApplyState() call
-            _vertexBuffers = new VertexBufferBindings(_maxVertexBufferSlots);
-            _vertexBuffersDirty = true;
             _indexBufferDirty = true;
+            _vertexBufferDirty = true;
             _vertexShaderDirty = true;
             _pixelShaderDirty = true;
 
@@ -427,31 +415,16 @@ namespace Microsoft.Xna.Framework.Graphics
             options |= ClearOptions.DepthBuffer;
             options |= ClearOptions.Stencil;
             PlatformClear(options, color.ToVector4(), _viewport.MaxDepth, 0);
-
-            unchecked
-            {
-                _graphicsMetrics._clearCount++;
-            }
         }
 
         public void Clear(ClearOptions options, Color color, float depth, int stencil)
         {
             PlatformClear(options, color.ToVector4(), depth, stencil);
-
-            unchecked
-            {
-                _graphicsMetrics._clearCount++;
-            }
         }
 
 		public void Clear(ClearOptions options, Vector4 color, float depth, int stencil)
 		{
             PlatformClear(options, color, depth, stencil);
-
-            unchecked
-            {
-                _graphicsMetrics._clearCount++;
-            }
         }
 
         public void Dispose()
@@ -506,7 +479,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Present()
         {
-            _graphicsMetrics = new GraphicsMetrics();
             PlatformPresent();
         }
 
@@ -656,27 +628,17 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void SetRenderTarget(RenderTarget2D renderTarget)
 		{
 			if (renderTarget == null)
-		    {
                 SetRenderTargets(null);
-		    }
 			else
-			{
-				_tempRenderTargetBinding[0] = new RenderTargetBinding(renderTarget);
-				SetRenderTargets(_tempRenderTargetBinding);
-			}
+				SetRenderTargets(new RenderTargetBinding(renderTarget));
 		}
 
         public void SetRenderTarget(RenderTargetCube renderTarget, CubeMapFace cubeMapFace)
         {
             if (renderTarget == null)
-            {
-                SetRenderTargets(null);
-            }
+                SetRenderTarget(null);
             else
-            {
-                _tempRenderTargetBinding[0] = new RenderTargetBinding(renderTarget, cubeMapFace);
-                SetRenderTargets(_tempRenderTargetBinding);
-            }
+                SetRenderTargets(new RenderTargetBinding(renderTarget, cubeMapFace));
         }
 
 		public void SetRenderTargets(params RenderTargetBinding[] renderTargets)
@@ -687,9 +649,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 renderTargetCount = renderTargets.Length;
                 if (renderTargetCount == 0)
-                {
                     renderTargets = null;
-                }
             }
 
             // Try to early out if the current and new bindings are equal.
@@ -711,21 +671,6 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             ApplyRenderTargets(renderTargets);
-
-            if (renderTargetCount == 0)
-            {
-                unchecked
-                {
-                    _graphicsMetrics._targetCount++;
-                }
-            }
-            else
-            {
-                unchecked
-                {
-                    _graphicsMetrics._targetCount += (ulong)renderTargetCount;
-                }
-            }
         }
 
         internal void ApplyRenderTargets(RenderTargetBinding[] renderTargets)
@@ -793,42 +738,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetVertexBuffer(VertexBuffer vertexBuffer)
         {
-            _vertexBuffersDirty |= (vertexBuffer == null)
-                                   ? _vertexBuffers.Clear()
-                                   : _vertexBuffers.Set(vertexBuffer, 0);
-        }
+            if (_vertexBuffer == vertexBuffer)
+                return;
 
-        public void SetVertexBuffer(VertexBuffer vertexBuffer, int vertexOffset)
-        {
-            // Validate vertexOffset.
-            if (vertexOffset < 0
-                || vertexBuffer == null && vertexOffset != 0
-                || vertexBuffer != null && vertexOffset >= vertexBuffer.VertexCount)
-            {
-                throw new ArgumentOutOfRangeException("vertexOffset");
-            }
-
-            _vertexBuffersDirty |= (vertexBuffer == null)
-                                   ? _vertexBuffers.Clear()
-                                   : _vertexBuffers.Set(vertexBuffer, vertexOffset);
-        }
-
-        public void SetVertexBuffers(params VertexBufferBinding[] vertexBuffers)
-        {
-            if (vertexBuffers == null || vertexBuffers.Length == 0)
-            {
-                _vertexBuffersDirty |= _vertexBuffers.Clear();
-            }
-            else
-            {
-                if (vertexBuffers.Length > _maxVertexBufferSlots)
-                {
-                    var message = string.Format(CultureInfo.InvariantCulture, "Max number of vertex buffers is {0}.", _maxVertexBufferSlots);
-                    throw new ArgumentOutOfRangeException("vertexBuffers", message);
-                }
-
-                _vertexBuffersDirty |= _vertexBuffers.Set(vertexBuffers);
-            }
+            _vertexBuffer = vertexBuffer;
+            _vertexBufferDirty = true;
         }
 
         private void SetIndexBuffer(IndexBuffer indexBuffer)
@@ -852,7 +766,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     return;
 
                 _vertexShader = value;
-                _vertexConstantBuffers.Clear();
                 _vertexShaderDirty = true;
             }
         }
@@ -867,7 +780,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     return;
 
                 _pixelShader = value;
-                _pixelConstantBuffers.Clear();
                 _pixelShaderDirty = true;
             }
         }
@@ -887,23 +799,17 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <param name="primitiveType">The type of primitives in the index buffer.</param>
         /// <param name="baseVertex">Used to offset the vertex range indexed from the vertex buffer.</param>
-        /// <param name="minVertexIndex">This is unused and remains here only for XNA API compatibility.</param>
-        /// <param name="numVertices">This is unused and remains here only for XNA API compatibility.</param>
+        /// <param name="minVertexIndex">A hint of the lowest vertex indexed relative to baseVertex.</param>
+        /// <param name="numVertices">An hint of the maximum vertex indexed.</param>
         /// <param name="startIndex">The index within the index buffer to start drawing from.</param>
         /// <param name="primitiveCount">The number of primitives to render from the index buffer.</param>
         /// <remarks>Note that minVertexIndex and numVertices are unused in MonoGame and will be ignored.</remarks>
-        [Obsolete("Use DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount) instead. In future versions this method can be removed.")]
         public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount)
-        {
-            DrawIndexedPrimitives(primitiveType, baseVertex, startIndex, primitiveCount);
-        }
-
-        public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
         {
             if (_vertexShader == null)
                 throw new InvalidOperationException("Vertex shader must be set before calling DrawIndexedPrimitives.");
 
-            if (_vertexBuffers.Count == 0)
+            if (_vertexBuffer == null)
                 throw new InvalidOperationException("Vertex buffer must be set before calling DrawIndexedPrimitives.");
 
             if (_indexBuffer == null)
@@ -912,13 +818,13 @@ namespace Microsoft.Xna.Framework.Graphics
             if (primitiveCount <= 0)
                 throw new ArgumentOutOfRangeException("primitiveCount");
 
-            PlatformDrawIndexedPrimitives(primitiveType, baseVertex, startIndex, primitiveCount);
+            // NOTE: minVertexIndex and numVertices are only hints of the
+            // range of vertex data which will be indexed.
+            //
+            // They will only be used if the graphics API can use
+            // this range hint to optimize rendering.
 
-            unchecked
-            {
-                _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong)primitiveCount;
-            }
+            PlatformDrawIndexedPrimitives(primitiveType, baseVertex, startIndex, primitiveCount);
         }
 
         public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
@@ -949,12 +855,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentNullException("vertexDeclaration");
 
             PlatformDrawUserPrimitives<T>(primitiveType, vertexData, vertexOffset, vertexDeclaration, vertexCount);
-
-            unchecked
-            {
-                _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
-            }
         }
 
         public void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
@@ -962,7 +862,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_vertexShader == null)
                 throw new InvalidOperationException("Vertex shader must be set before calling DrawPrimitives.");
 
-            if (_vertexBuffers.Count == 0)
+            if (_vertexBuffer == null)
                 throw new InvalidOperationException("Vertex buffer must be set before calling DrawPrimitives.");
 
             if (primitiveCount <= 0)
@@ -971,12 +871,6 @@ namespace Microsoft.Xna.Framework.Graphics
             var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
 
             PlatformDrawPrimitives(primitiveType, vertexStart, vertexCount);
-
-            unchecked
-            {
-                _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
-            }
         }
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
@@ -1017,12 +911,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentNullException("vertexDeclaration");
 
             PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
-
-            unchecked
-            {
-                _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
-            }
         }
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
@@ -1063,36 +951,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentNullException("vertexDeclaration");
 
             PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
-            
-            unchecked
-            {
-                _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
-            }
-        }
-
-        public void DrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex,
-                                            int numVertices, int startIndex, int primitiveCount, int instanceCount)
-        {
-            if (_vertexShader == null)
-                throw new InvalidOperationException("Vertex shader must be set before calling DrawInstancedPrimitives.");
-
-            if (_vertexBuffers.Count == 0)
-                throw new InvalidOperationException("Vertex buffer must be set before calling DrawInstancedPrimitives.");
-
-            if (_indexBuffer == null)
-                throw new InvalidOperationException("Index buffer must be set before calling DrawInstancedPrimitives.");
-
-            if (primitiveCount <= 0)
-                throw new ArgumentOutOfRangeException("primitiveCount");
-
-            PlatformDrawInstancedPrimitives(primitiveType, baseVertex, startIndex, primitiveCount, instanceCount);
-
-            unchecked
-            {
-                _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong)(primitiveCount * instanceCount);
-            }
         }
 
         private static int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)
@@ -1117,22 +975,5 @@ namespace Microsoft.Xna.Framework.Graphics
             return PlatformGetHighestSupportedGraphicsProfile(graphicsDevice);
         }
 
-        // uniformly scales down the given rectangle by 10%
-        internal static Rectangle GetDefaultTitleSafeArea(int x, int y, int width, int height)
-        {
-            var marginX = (width + 19) / 20;
-            var marginY = (height + 19) / 20;
-            x += marginX;
-            y += marginY;
-
-            width -= marginX * 2;
-            height -= marginY * 2;
-            return new Rectangle(x, y, width, height);
-        }
-
-        internal static Rectangle GetTitleSafeArea(int x, int y, int width, int height)
-        {
-            return PlatformGetTitleSafeArea(x, y, width, height);
-        }
     }
 }

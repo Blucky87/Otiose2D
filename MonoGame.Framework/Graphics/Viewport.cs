@@ -144,11 +144,21 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
 		public Rectangle TitleSafeArea 
 		{
-			get { return GraphicsDevice.GetTitleSafeArea(x, y, width, height); }
+			get
+			{
+                // TODO : Possible change it for XBOX or PS4 
+
+                var iSafeStartX = x;
+                var iSafeStartY = y;
+                var iSafeWidth = width;
+                var iSafeHeight = height;
+
+                return new Rectangle(iSafeStartX, iSafeStartY, iSafeWidth, iSafeHeight);
+			}
 		}
 
         /// <summary>
-        /// Constructs a viewport from the given values. The <see cref="MinDepth"/> will be 0.0 and <see cref="MaxDepth"/> will be 1.0.
+        /// Creates a new instance of <see cref="Viewport"/> struct.
         /// </summary>
         /// <param name="x">The x coordinate of the upper-left corner of the view bounds in pixels.</param>
         /// <param name="y">The y coordinate of the upper-left corner of the view bounds in pixels.</param>
@@ -165,7 +175,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Constructs a viewport from the given values.
+        /// Creates a new instance of <see cref="Viewport"/> struct.
         /// </summary>
         /// <param name="x">The x coordinate of the upper-left corner of the view bounds in pixels.</param>
         /// <param name="y">The y coordinate of the upper-left corner of the view bounds in pixels.</param>

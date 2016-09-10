@@ -13,7 +13,8 @@ namespace Microsoft.Xna.Framework.Media
         private Album album;
         private Artist artist;
         private Genre genre;
-        
+
+#if !WINDOWS_UAP
 		private MusicProperties musicProperties;
 
         [CLSCompliant(false)]
@@ -21,14 +22,22 @@ namespace Microsoft.Xna.Framework.Media
         {
             get { return this.musicProperties.File; }
         }
-        
-		internal Song(Album album, Artist artist, Genre genre, MusicProperties musicProperties)
-		{
+#endif
+
+		internal Song(Album album, Artist artist, Genre genre)
+        {
             this.album = album;
             this.artist = artist;
             this.genre = genre;
-            this.musicProperties = musicProperties;
+        }
+
+#if !WINDOWS_UAP
+		internal Song(Album album, Artist artist, Genre genre, MusicProperties musicProperties)
+			: this(album, artist, genre)
+		{
+			this.musicProperties = musicProperties;
 		}
+#endif
 
 		private void PlatformInitialize(string fileName)
         {
@@ -62,33 +71,37 @@ namespace Microsoft.Xna.Framework.Media
 
         private TimeSpan PlatformGetDuration()
         {
+#if !WINDOWS_UAP
             if (this.musicProperties != null)
                 return this.musicProperties.Duration;
-
+#endif
             return _duration;
         }
 
         private bool PlatformIsProtected()
         {
+#if !WINDOWS_UAP
             if (this.musicProperties != null)
                 return this.musicProperties.IsProtected;
-
+#endif
             return false;
         }
 
         private bool PlatformIsRated()
         {
+#if !WINDOWS_UAP
             if (this.musicProperties != null)
                 return this.musicProperties.Rating != 0;
-
+#endif
             return false;
         }
 
         private string PlatformGetName()
         {
+#if !WINDOWS_UAP
             if (this.musicProperties != null)
                 return this.musicProperties.Title;
-
+#endif
             return Path.GetFileNameWithoutExtension(_name);
         }
 
@@ -99,17 +112,19 @@ namespace Microsoft.Xna.Framework.Media
 
         private int PlatformGetRating()
         {
+#if !WINDOWS_UAP
             if (this.musicProperties != null)
                 return this.musicProperties.Rating;
-
+#endif
             return 0;
         }
 
         private int PlatformGetTrackNumber()
         {
+#if !WINDOWS_UAP
             if (this.musicProperties != null)
                 return this.musicProperties.TrackNumber;
-
+#endif
             return 0;
         }
     }

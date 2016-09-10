@@ -15,9 +15,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     public abstract class ContentBuildLogger
     {
         Stack<string> filenames = new Stack<string>();
-        private int indentCount = 0;
-
-        protected string IndentString { get { return String.Empty.PadLeft(Math.Max(0, indentCount), '\t'); } }
 
         /// <summary>
         /// Gets or sets the base reference path used when reporting errors during the content build process.
@@ -112,16 +109,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         public void PushFile(string filename)
         {
             filenames.Push(filename);
-        }
-
-        public void Indent()
-        {
-            indentCount++;
-        }
-
-        public void Unindent()
-        {
-            indentCount--;
         }
     }
 }

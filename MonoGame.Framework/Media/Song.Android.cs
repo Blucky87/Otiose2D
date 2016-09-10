@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Framework.Media
             // Appears to be a noOp on Android
         }
 
-        internal void Play(TimeSpan? startPosition)
+        internal void Play()
         {
             // Prepare the player
             _androidPlayer.Reset();
@@ -94,8 +94,6 @@ namespace Microsoft.Xna.Framework.Media
             _androidPlayer.Looping = MediaPlayer.IsRepeating;
             _playingSong = this;
 
-            if (startPosition.HasValue)
-                Position = startPosition.Value;
             _androidPlayer.Start();
             _playCount++;
         }

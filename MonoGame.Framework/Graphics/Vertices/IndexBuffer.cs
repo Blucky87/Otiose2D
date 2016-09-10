@@ -24,7 +24,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 			if (graphicsDevice == null)
             {
-                throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
+                throw new ArgumentNullException("graphicsDevice");
             }
 			this.GraphicsDevice = graphicsDevice;
 			this.IndexElementSize = indexElementSize;	

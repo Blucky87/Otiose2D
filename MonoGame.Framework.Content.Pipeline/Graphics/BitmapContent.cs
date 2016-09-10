@@ -24,7 +24,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             {
                 return height;
             }
-            protected set
+            set
             {
                 if (value <= 0)
                     throw new ArgumentOutOfRangeException("height");
@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             {
                 return width;
             }
-            protected set
+            set
             {
                 if (value <= 0)
                     throw new ArgumentOutOfRangeException("width");
@@ -99,42 +99,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             ValidateCopyArguments(sourceBitmap, sourceRegion, destinationBitmap, destinationRegion);
 
-            SurfaceFormat sourceFormat;
-            if (!sourceBitmap.TryGetFormat(out sourceFormat))
-                throw new InvalidOperationException("Could not retrieve surface format of source bitmap");
-            SurfaceFormat destinationFormat;
-            if (!destinationBitmap.TryGetFormat(out destinationFormat))
-                throw new InvalidOperationException("Could not retrieve surface format of destination bitmap");
-
-            // If the formats are the same and the regions are the full bounds of the bitmaps and they are the same size, do a simpler copy
-            if (sourceFormat == destinationFormat && sourceRegion == destinationRegion
-                && sourceRegion == new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height)
-                && destinationRegion == new Rectangle(0, 0, destinationBitmap.Width, destinationBitmap.Height))
-            {
-                destinationBitmap.SetPixelData(sourceBitmap.GetPixelData());
+            if (sourceBitmap.TryCopyTo(destinationBitmap, sourceRegion, destinationRegion) ||
+                destinationBitmap.TryCopyFrom(sourceBitmap, sourceRegion, destinationRegion))
                 return;
-            }
 
-            // The basic process is
-            // 1. Copy from source bitmap region to a new PixelBitmapContent<Vector4> using sourceBitmap.TryCopyTo()
-            // 2. If source and destination regions are a different size, resize Vector4 version
-            // 3. Copy from Vector4 to destination region using destinationBitmap.TryCopyFrom()
-
-            // Copy from the source to the intermediate Vector4 format
-            var intermediate = new PixelBitmapContent<Vector4>(sourceRegion.Width, sourceRegion.Height);
-            var intermediateRegion = new Rectangle(0, 0, intermediate.Width, intermediate.Height);
-            if (sourceBitmap.TryCopyTo(intermediate, sourceRegion, intermediateRegion))
-            {
-                // Resize the intermediate if required
-                if (intermediate.Width != destinationRegion.Width || intermediate.Height != destinationRegion.Height)
-                    intermediate = intermediate.Resize(destinationRegion.Width, destinationRegion.Height) as PixelBitmapContent<Vector4>;
-                // Copy from the intermediate to the destination
-                if (destinationBitmap.TryCopyFrom(intermediate, new Rectangle(0, 0, intermediate.Width, intermediate.Height), destinationRegion))
-                    return;
-            }
-
-            // If we got here, one of the above steps didn't work
-            throw new InvalidOperationException("Could not copy between " + sourceFormat + " and " + destinationFormat);
+            throw new NotImplementedException();
         }
 
         /// <summary>

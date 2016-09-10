@@ -290,17 +290,18 @@ namespace Microsoft.Xna.Framework
 
         #endregion
 
-        #region Key and Motion and Gamepad
+        #region Key and Motion
 
         public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
         {
-            // Handle gamepad inputs in Android/OUYA
-            if ((e.Source & InputSourceType.Gamepad) == InputSourceType.Gamepad)
-                return GamePad.OnKeyDown(keyCode, e);
+#if OUYA
+            if (GamePad.OnKeyDown(keyCode, e))
+                return true;
+#endif
 
             Keyboard.KeyDown(keyCode);
-#if !OUYA
             // we need to handle the Back key here because it doesnt work any other way
+#if !OUYA
             if (keyCode == Keycode.Back && !this.backPressed)
             {
                 this.backPressed = true;
@@ -328,13 +329,13 @@ namespace Microsoft.Xna.Framework
 
         public override bool OnKeyUp(Keycode keyCode, KeyEvent e)
         {
-            if ((e.Source & InputSourceType.Gamepad) == InputSourceType.Gamepad)
-                return GamePad.OnKeyUp(keyCode, e);
-
+#if OUYA
+            if (GamePad.OnKeyUp(keyCode, e))
+                return true;
+#endif
             Keyboard.KeyUp(keyCode);
 
 #if !OUYA
-            // we need to handle the Back key here because it doesnt work any other way
             if (keyCode == Keycode.Back)
                 this.backPressed = false;
 #endif
@@ -342,13 +343,15 @@ namespace Microsoft.Xna.Framework
             return true;
         }
 
+#if OUYA
         public override bool OnGenericMotionEvent(MotionEvent e)
         {
-            if ((e.Source & InputSourceType.Gamepad) == InputSourceType.Gamepad || (e.Source & InputSourceType.Joystick) == InputSourceType.Joystick)
-                return GamePad.OnGenericMotionEvent(e);                
+            if (GamePad.OnGenericMotionEvent(e))
+                return true;
 
             return base.OnGenericMotionEvent(e);
         }
+#endif
 
         #endregion
     }

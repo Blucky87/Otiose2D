@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public partial class PipelineController
+    internal partial class PipelineController
     {        
         private class NewAction : IProjectAction
         {
@@ -42,6 +42,8 @@ namespace MonoGame.Tools.Pipeline
                 var parser = new PipelineProjectParser(_con, _con._project);
                 _con.View.BeginTreeUpdate();
 
+                _con.Selection.Clear(_con);
+
                 if (parser.AddContent(fullpath, true))
                 {
                     var item = _con._project.ContentItems.Last();
@@ -51,6 +53,7 @@ namespace MonoGame.Tools.Pipeline
                     item.ResolveTypes();
 
                     _con.View.AddTreeItem(item);
+                    _con.Selection.Add(item, _con);
                 }
 
                 _con.View.EndTreeUpdate();
@@ -84,6 +87,7 @@ namespace MonoGame.Tools.Pipeline
                     {
                         _con._project.ContentItems.Remove(item);
                         _con.View.RemoveTreeItem(item);
+                        _con.Selection.Remove(item, _con);
                     }
                 }
                     

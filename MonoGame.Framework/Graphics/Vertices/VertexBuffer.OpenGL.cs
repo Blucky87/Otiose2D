@@ -8,14 +8,11 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
-#if MONOMAC && PLATFORM_MACOS_LEGACY
+#if MONOMAC
 using MonoMac.OpenGL;
 #endif
-#if MONOMAC && !PLATFORM_MACOS_LEGACY
+#if WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#endif
-#if DESKTOPGL
-using OpenGL;
 #endif
 #if GLES
 using OpenTK.Graphics.ES20;
@@ -87,13 +84,13 @@ namespace Microsoft.Xna.Framework.Graphics
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
             IntPtr ptr = GL.MapBuffer (BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
             GraphicsExtensions.CheckGLError();
-            // Pointer to the start of data to read in the vertex buffer
+            // Pointer to the start of data to read in the index buffer
             ptr = new IntPtr (ptr.ToInt64 () + offsetInBytes);
 			if (typeof(T) == typeof(byte)) {
                 byte[] buffer = data as byte[];
                 // If data is already a byte[] we can skip the temporary buffer
                 // Copy from the vertex buffer to the destination array
-                Marshal.Copy (ptr, buffer, startIndex * vertexStride, elementCount * vertexStride);
+                Marshal.Copy (ptr, buffer, 0, buffer.Length);
             } else {
                 // Temporary buffer to store the copied section of data
                 byte[] buffer = new byte[elementCount * vertexStride - offsetInBytes];
@@ -123,8 +120,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 //Buffer.BlockCopy(buffer, 0, data, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
             }
             GL.UnmapBuffer(BufferTarget.ArrayBuffer);
-            GraphicsExtensions.CheckGLError();
-        }
+            }
         
 #endif
 
@@ -162,21 +158,8 @@ namespace Microsoft.Xna.Framework.Graphics
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
             var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInBytes);
 
-            int dataSize = Marshal.SizeOf(typeof(T));
-            if (dataSize == vertexStride)
-            {
-                GL.BufferSubData(BufferTarget.ArrayBuffer, (IntPtr) offsetInBytes, (IntPtr) sizeInBytes, dataPtr);
-                GraphicsExtensions.CheckGLError();
-            }
-            else
-            {
-                for (int i = 0; i < elementCount; i++)
-                {
-                    GL.BufferSubData(BufferTarget.ArrayBuffer, (IntPtr)offsetInBytes + i * vertexStride, (IntPtr)dataSize, dataPtr);
-                    GraphicsExtensions.CheckGLError();
-                    dataPtr = (IntPtr)(dataPtr.ToInt64() + dataSize);
-                }
-            }
+            GL.BufferSubData(BufferTarget.ArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, dataPtr);
+            GraphicsExtensions.CheckGLError();
 
             dataHandle.Free();
         }

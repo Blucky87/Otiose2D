@@ -3,27 +3,26 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.IO;
-using System.Collections.Generic;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public partial class PipelineController
+    internal partial class PipelineController
     {        
         private class MoveAction : IProjectAction
         {
             private readonly PipelineController _con;
 
-            private readonly string[] paths;
-            private readonly string[] newpaths;
-            private readonly FileType[] types;
+            private readonly string path;
+            private readonly string newpath;
+            private readonly FileType type;
 
-            public MoveAction(PipelineController controller, string[] paths, string[] newpaths, FileType[] types)
+            public MoveAction(PipelineController controller, string path, string newpath, FileType type)
             {
                 _con = controller;
 
-                this.paths = paths;
-                this.newpaths = newpaths;
-                this.types = types;
+                this.path = path;
+                this.newpath = newpath;
+                this.type = type;
             }
 
             private bool Move(string path, string newpath, FileType type)
@@ -81,25 +80,13 @@ namespace MonoGame.Tools.Pipeline
                         return false;
                     }
 
-                    var cis = new List<ContentItem>();
-                    var nps = new List<string>();
-
                     for (var i = 0; i < _con._project.ContentItems.Count; i++)
                     {
                         var item = _con._project.ContentItems[i];
                         if (item.OriginalPath.StartsWith(path))
-                        {
-                            cis.Add(item);
-                            nps.Add(newpath + item.OriginalPath.Substring(path.Length));
-                        }
+                            MoveFile(item, newpath + item.OriginalPath.Substring(path.Length));
                     }
-
-                    for (int i = 0; i < nps.Count; i++)
-                    {
-                        MoveFile(cis[i], newpath +  cis[i].OriginalPath.Substring(path.Length));
-                    }
-
-                    _con.View.RemoveTreeItem(new DirectoryItem(path));
+                    _con.View.RemoveTreeFolder(path);
                 }
                 else
                     _con.MoveProject(newpath);
@@ -124,22 +111,12 @@ namespace MonoGame.Tools.Pipeline
 
             public bool Do()
             {
-                bool ret = true;
-
-                for (int i = 0; i < paths.Length; i++)
-                    ret = ret && Move(paths[i], newpaths[i], types[i]);
-
-                return ret;
+                return Move(path, newpath, type);
             }
 
             public bool Undo()
             {
-                bool ret = true;
-
-                for (int i = 0; i < paths.Length; i++)
-                    ret = ret && Move(newpaths[i], paths[i], types[i]);
-
-                return ret;
+                return Move(newpath, path, type);
             }
         }
     }

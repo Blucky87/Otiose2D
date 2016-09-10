@@ -41,6 +41,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private SurfaceFormat format;
         private int height;
+        private int refreshRate;
         private int width;
 
         #endregion Fields
@@ -59,22 +60,27 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return this.height; }
         }
 
+        public int RefreshRate {
+            get { return this.refreshRate; }
+        }
+
         public int Width {
             get { return this.width; }
         }
         
         public Rectangle TitleSafeArea {
-            get { return GraphicsDevice.GetTitleSafeArea(0, 0, width, height); }
+            get { return new Rectangle(0, 0, Width, Height); }    
         }
 
         #endregion Properties
 
         #region Constructors
         
-        internal DisplayMode(int width, int height, SurfaceFormat format)
+        internal DisplayMode(int width, int height, int refreshRate, SurfaceFormat format)
         {
             this.width = width;
             this.height = height;
+            this.refreshRate = refreshRate;
             this.format = format;
         }
 
@@ -99,6 +105,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             return (left.format == right.format) &&
                 (left.height == right.height) &&
+                (left.refreshRate == right.refreshRate) &&
                 (left.width == right.width);
         }
 
@@ -113,12 +120,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public override int GetHashCode()
         {
-            return (this.width.GetHashCode() ^ this.height.GetHashCode() ^ this.format.GetHashCode());
+            return (this.width.GetHashCode() ^ this.height.GetHashCode() ^ this.refreshRate.GetHashCode() ^ this.format.GetHashCode());
         }
 
         public override string ToString()
         {
-            return "{Width:" + this.width + " Height:" + this.height + " Format:" + this.Format + " AspectRatio:" + this.AspectRatio + "}";
+            return "{{Width:" + this.width + " Height:" + this.height + " Format:" + this.Format + " RefreshRate:" + this.refreshRate + "}}";
         }
 
         #endregion Public Methods

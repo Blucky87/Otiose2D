@@ -1,8 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
-// This file is subject to the terms and conditions defined in
-// file 'LICENSE.txt', which is part of this source code package.
-
-using System;
+﻿using System;
 using System.Reflection;
 
 namespace MonoGame.Utilities
@@ -18,7 +14,7 @@ namespace MonoGame.Utilities
             var assembly = Assembly.GetEntryAssembly();
             if (assembly != null)
             {
-                // Use the Title attribute of the Assembly if possible.
+                //Use the Title attribute of the Assembly if possible.
                 var assemblyTitleAtt = ((AssemblyTitleAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyTitleAttribute)));
                 if (assemblyTitleAtt != null)
                     windowTitle = assemblyTitleAtt.Title;

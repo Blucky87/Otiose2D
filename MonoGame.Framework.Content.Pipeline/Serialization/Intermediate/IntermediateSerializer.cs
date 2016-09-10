@@ -66,7 +66,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         private Dictionary<string, string> _namespaceLookup;
 
         private Dictionary<Type, ContentTypeSerializer> _serializers;
-        private Dictionary<Type, GenericCollectionHelper> _collectionHelpers;
 
         private Dictionary<Type, Type> _genericSerializerTypes;
 
@@ -161,7 +160,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             {
                 serializer = new EnumSerializer(type);
             }
-            else if (typeof(IList).IsAssignableFrom(type) && !GenericCollectionHelper.IsGenericCollectionType(type, true))
+            else if (typeof(IList).IsAssignableFrom(type))
             {
                 // Special handling for non-generic IList types. By the time we get here,
                 // generic collection types will already have been handled by one of the known serializers.
@@ -188,20 +187,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             return serializer;
         }
 
-        internal GenericCollectionHelper GetCollectionHelper(Type type)
-        {
-            if (_collectionHelpers == null)
-                _collectionHelpers = new Dictionary<Type, GenericCollectionHelper>();
-
-            GenericCollectionHelper result;
-            if (!_collectionHelpers.TryGetValue(type, out result))
-            {
-                result = new GenericCollectionHelper(this, type);
-                _collectionHelpers.Add(type, result);
-            }
-            return result;
-        }
-
         public static void Serialize<T>(XmlWriter output, T value, string referenceRelocationPath)
         {
             var serializer = new IntermediateSerializer();
@@ -212,7 +197,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
             // Write the asset.
             var format = new ContentSerializerAttribute { ElementName = "Asset" };
-            writer.WriteObject<object>(value, format);
+            writer.WriteObjectInternal(value, format, serializer.GetTypeSerializer(typeof(T)), typeof(object));
 
             // Process the shared resources and external references.
             writer.WriteSharedResources();

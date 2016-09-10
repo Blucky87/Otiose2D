@@ -1,5 +1,10 @@
 using System.Diagnostics;
 
+#if PSM
+using Sce.PlayStation.Core.Graphics;
+#endif
+
+
 namespace Microsoft.Xna.Framework.Graphics
 {
     public class EffectPass
@@ -16,6 +21,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		public string Name { get; private set; }
 
         public EffectAnnotationCollection Annotations { get; private set; }
+
+#if PSM
+        internal ShaderProgram _shaderProgram;
+#endif
 
         internal EffectPass(    Effect effect, 
                                 string name,
@@ -58,21 +67,28 @@ namespace Microsoft.Xna.Framework.Graphics
             Annotations = cloneSource.Annotations;
             _vertexShader = cloneSource._vertexShader;
             _pixelShader = cloneSource._pixelShader;
+#if PSM
+            _shaderProgram = cloneSource._shaderProgram;
+#endif
         }
 
         public void Apply()
         {
             // Set/get the correct shader handle/cleanups.
-
-            var current = _effect.CurrentTechnique;
-            _effect.OnApply();
-            if (_effect.CurrentTechnique != current)
+            //
+            // TODO: This "reapply" if the shader index changes
+            // trick is sort of ugly.  We should probably rework
+            // this to use some sort of "technique/pass redirect".
+            //
+            if (_effect.OnApply())
             {
                 _effect.CurrentTechnique.Passes[0].Apply();
                 return;
             }
 
             var device = _effect.GraphicsDevice;
+
+#if OPENGL || DIRECTX
 
             if (_vertexShader != null)
             {
@@ -106,6 +122,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
+#endif
+
             // Set the render states if we have some.
             if (_rasterizerState != null)
                 device.RasterizerState = _rasterizerState;
@@ -113,6 +131,24 @@ namespace Microsoft.Xna.Framework.Graphics
                 device.BlendState = _blendState;
             if (_depthStencilState != null)
                 device.DepthStencilState = _depthStencilState;
+            
+#if PSM
+            _effect.GraphicsDevice._graphics.SetShaderProgram(_shaderProgram);
+
+            #warning We are only setting one hardcoded parameter here. Need to do this properly by iterating _effect.Parameters (Happens in Shader)
+
+            float[] data;
+            if (_effect.Parameters["WorldViewProj"] != null) 
+                data = (float[])_effect.Parameters["WorldViewProj"].Data;
+            else
+                data = (float[])_effect.Parameters["MatrixTransform"].Data;
+            Sce.PlayStation.Core.Matrix4 matrix4 = PSSHelper.ToPssMatrix4(data);
+            matrix4 = matrix4.Transpose (); //When .Data is set the matrix is transposed, we need to do it again to undo it
+            _shaderProgram.SetUniformValue(0, ref matrix4);
+            
+            if (_effect.Parameters["Texture0"].Data != null && _effect.Parameters["Texture0"].Data != null)
+                _effect.GraphicsDevice._graphics.SetTexture(0, ((Texture2D)_effect.Parameters["Texture0"].Data)._texture2D);
+#endif
         }
 
         private void SetShaderSamplers(Shader shader, TextureCollection textures, SamplerStateCollection samplerStates)

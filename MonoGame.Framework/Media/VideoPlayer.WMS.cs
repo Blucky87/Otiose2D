@@ -22,13 +22,6 @@ namespace Microsoft.Xna.Framework.Media
 
         private class Callback : IAsyncCallback
         {
-            private VideoPlayer _player;
-
-            public Callback(VideoPlayer player)
-            {
-                _player = player;
-            }
-
             public void Dispose()
             {
             }
@@ -39,9 +32,6 @@ namespace Microsoft.Xna.Framework.Media
                 var ev = _session.EndGetEvent(asyncResultRef);
 
                 // Trigger an "on Video Ended" event here if needed
-
-                if (ev.TypeInfo == MediaEventTypes.SessionTopologyStatus && ev.Get(EventAttributeKeys.TopologyStatus) == TopologyStatus.Ready)
-                    _player.OnTopologyReady();
 
                 _session.BeginGetEvent(this, null);
             }
@@ -110,28 +100,25 @@ namespace Microsoft.Xna.Framework.Media
             if (State != MediaState.Stopped)
             {
                 _session.Stop();
-                _session.ClearTopologies();
-                _session.Close();
-                if (_volumeController != null)
-                {
-                    _volumeController.Dispose();
-                    _volumeController = null;
-                }
+                _volumeController.Dispose();
                 _clock.Dispose();
             }
+
+            // Set the new song.
+            _session.SetTopology(0, _currentVideo.Topology);
+
+            _volumeController = CppObject.FromPointer<AudioStreamVolume>(MediaPlayer.GetVolumeObj(_session));
+            SetChannelVolumes();
+
+            // Get the clock.
+            _clock = _session.Clock.QueryInterface<PresentationClock>();
 
             //create the callback if it hasn't been created yet
             if (_callback == null)
             {
-                _callback = new Callback(this);
+                _callback = new Callback();
                 _session.BeginGetEvent(_callback, null);
             }
-
-            // Set the new song.
-            _session.SetTopology(SessionSetTopologyFlags.Immediate, _currentVideo.Topology);
-
-            // Get the clock.
-            _clock = _session.Clock.QueryInterface<PresentationClock>();
 
             // Start playing.
             var varStart = new Variant();
@@ -148,27 +135,19 @@ namespace Microsoft.Xna.Framework.Media
             _session.ClearTopologies();
             _session.Stop();
             _session.Close();
-            if (_volumeController != null)
-            {
-                _volumeController.Dispose();
-                _volumeController = null;
-            }
+            _volumeController.Dispose();
+            _volumeController = null;
             _clock.Dispose();
             _clock = null;
         }
 
         private void SetChannelVolumes()
         {
-            if (_volumeController != null && !_volumeController.IsDisposed)
+            if (_volumeController != null)
             {
-                float volume = _volume;
-                if (IsMuted)
-                    volume = 0.0f;
-
+                float volume = !_isMuted ? _volume : 0.0f;
                 for (int i = 0; i < _volumeController.ChannelCount; i++)
-                {
                     _volumeController.SetChannelVolume(i, volume);
-                }
             }
         }
 
@@ -200,19 +179,6 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformDispose(bool disposing)
         {
-        }
-
-        private void OnTopologyReady()
-        {
-            if (_session.IsDisposed)
-                return;
-
-            // Get the volume interface.
-            IntPtr volumeObjectPtr;
-            MediaFactory.GetService(_session, MediaServiceKeys.StreamVolume, AudioStreamVolumeGuid, out volumeObjectPtr);
-            _volumeController = CppObject.FromPointer<AudioStreamVolume>(volumeObjectPtr);
-
-            SetChannelVolumes();
         }
     }
 }

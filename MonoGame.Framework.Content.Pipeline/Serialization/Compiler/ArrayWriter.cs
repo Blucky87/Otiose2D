@@ -14,12 +14,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     {
         ContentTypeWriter _elementWriter;
 
-        /// <inheritdoc/>
-        internal override void OnAddedToContentWriter(ContentWriter output)
+        protected override void Initialize(ContentCompiler compiler)
         {
-            base.OnAddedToContentWriter(output);
+            base.Initialize(compiler);
 
-            _elementWriter = output.GetTypeWriter(typeof(T));
+            _elementWriter = compiler.GetTypeWriter(typeof(T));
         }
 
         public override string GetRuntimeReader(TargetPlatform targetPlatform)

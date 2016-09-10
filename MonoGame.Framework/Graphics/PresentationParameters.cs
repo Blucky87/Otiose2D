@@ -9,11 +9,7 @@ using Windows.UI.Xaml.Controls;
 #endif
 
 #if MONOMAC
-#if PLATFORM_MACOS_LEGACY
 using MonoMac.AppKit;
-#else
-using AppKit;
-#endif
 #elif IOS
 using UIKit;
 using Microsoft.Xna.Framework.Input.Touch;
@@ -122,7 +118,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // If we are not on windows 8 set the value otherwise ignore it.
                 isFullScreen = value;				
 #endif
-#if IOS && !TVOS
+#if IOS
 				UIApplication.SharedApplication.StatusBarHidden = isFullScreen;
 #endif
 
@@ -173,7 +169,7 @@ namespace Microsoft.Xna.Framework.Graphics
             backBufferHeight = GraphicsDeviceManager.DefaultBackBufferHeight;     
 #endif
             deviceWindowHandle = IntPtr.Zero;
-#if IOS && !TVOS
+#if IOS
 			isFullScreen = UIApplication.SharedApplication.StatusBarHidden;
 #else
             // isFullScreen = false;

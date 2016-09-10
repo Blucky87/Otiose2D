@@ -13,13 +13,14 @@ namespace Microsoft.Xna.Framework.Media
 		private int _playCount = 0;
         private TimeSpan _duration = TimeSpan.Zero;
         bool disposed;
+
         /// <summary>
         /// Gets the Album on which the Song appears.
         /// </summary>
         public Album Album
         {
             get { return PlatformGetAlbum(); }
-#if WINDOWS_STOREAPP || WINDOWS_UAP
+#if WINDOWS_STOREAPP
             internal set { PlatformSetAlbum(value); }
 #endif
         }
@@ -39,15 +40,10 @@ namespace Microsoft.Xna.Framework.Media
         {
             get { return PlatformGetGenre(); }
         }
-        
-        public bool IsDisposed
-        {
-            get { return disposed; }
-        }
 
-#if ANDROID || OPENAL || WEB || IOS
+#if ANDROID || OPENAL || PSM || WEB || IOS
         internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
-#if !DESKTOPGL
+#if !LINUX
         event FinishedPlayingHandler DonePlaying;
 #endif
 #endif

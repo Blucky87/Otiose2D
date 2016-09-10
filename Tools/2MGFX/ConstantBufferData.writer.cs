@@ -6,7 +6,8 @@ namespace TwoMGFX
     {
         public void Write(BinaryWriter writer, Options options)
         {
-            writer.Write(Name);
+            if (options.Profile == ShaderProfile.OpenGL)
+                writer.Write(Name);
 
             writer.Write((ushort)Size);
 

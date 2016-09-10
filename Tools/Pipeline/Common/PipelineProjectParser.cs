@@ -69,8 +69,6 @@ namespace MonoGame.Tools.Pipeline
             Description = "The optional build config string from the build system.")]
         public string Config { set { _project.Config = value; } }
 
-        #pragma warning disable 414
-
         // Allow a MGCB file containing the /rebuild parameter to be imported without error
         [CommandLineParameter(
             Name = "rebuild",
@@ -86,8 +84,6 @@ namespace MonoGame.Tools.Pipeline
             Description = "Removes intermediate and output files.")]
         public bool Clean { set { _clean = value; } }
         private bool _clean;
-
-        #pragma warning restore 414
 
         [CommandLineParameter(
             Name = "compress",

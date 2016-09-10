@@ -16,13 +16,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         ContentTypeWriter _keyWriter;
         ContentTypeWriter _valueWriter;
 
-        /// <inheritdoc/>
-        internal override void OnAddedToContentWriter(ContentWriter output)
+        protected override void Initialize(ContentCompiler compiler)
         {
-            base.OnAddedToContentWriter(output);
+            base.Initialize(compiler);
 
-            _keyWriter = output.GetTypeWriter(typeof(K));
-            _valueWriter = output.GetTypeWriter(typeof(V));
+            _keyWriter = compiler.GetTypeWriter(typeof(K));
+            _valueWriter = compiler.GetTypeWriter(typeof(V));
         }
 
         public override bool CanDeserializeIntoExistingObject
@@ -34,7 +33,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         {
             if (value == null)
                 throw new ArgumentNullException("value");
-
             output.Write(value.Count);
             foreach (var element in value)
             {

@@ -77,19 +77,6 @@ namespace Microsoft.Xna.Framework.Content
             return result;
         }
 
-        internal object ReadAsset<T>(T existingInstance)
-        {
-            InitializeTypeReaders();
-
-            // Read primary object
-            object result = ReadObject<T>(existingInstance);
-
-            // Read shared resources
-            ReadSharedResources();
-
-            return result;
-        }
-
         internal void InitializeTypeReaders()
         {
             typeReaderManager = new ContentTypeReaderManager();
@@ -160,7 +147,7 @@ namespace Microsoft.Xna.Framework.Content
 
         public T ReadObject<T>()
         {
-            return InnerReadObject(default(T));
+            return ReadObject(default(T));
         }
 
         public T ReadObject<T>(ContentTypeReader typeReader)

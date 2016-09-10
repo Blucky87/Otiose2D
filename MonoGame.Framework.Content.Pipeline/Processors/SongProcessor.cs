@@ -15,17 +15,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     [ContentProcessor(DisplayName = "Song - MonoGame")]
     public class SongProcessor : ContentProcessor<AudioContent, SongContent>
     {
-        ConversionQuality _quality = ConversionQuality.Best;
+        ConversionQuality quality = ConversionQuality.Best;
 
         /// <summary>
         /// Gets or sets the target format quality of the audio content.
         /// </summary>
         /// <value>The ConversionQuality of this audio data.</value>
-        public ConversionQuality Quality 
-        { 
-            get { return _quality; } 
-            set { _quality = value; } 
-        }
+        public ConversionQuality Quality { get { return quality; } set { quality = value; } }
 
         /// <summary>
         /// Initializes a new instance of SongProcessor.
@@ -42,17 +38,33 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <returns>The built audio.</returns>
         public override SongContent Process(AudioContent input, ContentProcessorContext context)
         {
-            // The xnb name is the basis for the final song filename.
-            var songFileName = context.OutputFilename;
+            // Most platforms will use AAC ("mp4") by default
+            var targetFormat = ConversionFormat.Aac;
+
+            switch (context.TargetPlatform)
+            {
+                case TargetPlatform.Windows:
+                case TargetPlatform.WindowsPhone8:
+                case TargetPlatform.WindowsStoreApp:
+                    targetFormat = ConversionFormat.WindowsMedia;
+                    break;
+
+                case TargetPlatform.Linux:
+                    targetFormat = ConversionFormat.Vorbis;
+                    break;
+            }
+
+            // Get the song output path with the target format extension.
+            var songFileName = Path.ChangeExtension(context.OutputFilename, AudioHelper.GetExtension(targetFormat));
+
+            // Make sure the output folder for the song exists.
+            Directory.CreateDirectory(Path.GetDirectoryName(songFileName));
 
             // Convert and write out the song media file.
-            var profile = AudioProfile.ForPlatform(context.TargetPlatform);
-            var finalQuality = profile.ConvertStreamingAudio(context.TargetPlatform, _quality, input, ref songFileName);
+            input.ConvertFormat(targetFormat, quality, songFileName);
 
             // Let the pipeline know about the song file so it can clean things up.
             context.AddOutputFile(songFileName);
-            if (_quality != finalQuality)
-                context.Logger.LogMessage("Failed to convert using \"{0}\" quality, used \"{1}\" quality", _quality, finalQuality);
 
             // Return the XNB song content.
             return new SongContent(PathHelper.GetRelativePath(Path.GetDirectoryName(context.OutputFilename) + Path.DirectorySeparatorChar, songFileName), input.Duration);

@@ -83,43 +83,37 @@ namespace Microsoft.Xna.Framework.Graphics
                     d3dContext.CopySubresourceRegion(GetTexture(), subresourceIndex, null, stagingTex, 0);
 
                     // Copy the data to the array.
-                    DataStream stream = null;
-                    try
+                    DataStream stream;
+                    var databox = d3dContext.MapSubresource(stagingTex, 0, MapMode.Read, MapFlags.None, out stream);
+
+                    const int startIndex = 0;
+                    var elementCount = data.Length;
+                    var elementSize = _format.GetSize();
+                    var elementsInRow = size;
+                    var rows = size;
+                    var rowSize = elementSize * elementsInRow;
+                    if (rowSize == databox.RowPitch)
+                        stream.ReadRange(data, startIndex, elementCount);
+                    else
                     {
-                        var databox = d3dContext.MapSubresource(stagingTex, 0, MapMode.Read, MapFlags.None, out stream);
+                        // Some drivers may add pitch to rows.
+                        // We need to copy each row separatly and skip trailing zeros.
+                        stream.Seek(startIndex, SeekOrigin.Begin);
 
-                        const int startIndex = 0;
-                        var elementCount = data.Length;
-                        var elementSize = _format.GetSize();
-                        var elementsInRow = size;
-                        var rows = size;
-                        var rowSize = elementSize * elementsInRow;
-                        if (rowSize == databox.RowPitch)
-                            stream.ReadRange(data, startIndex, elementCount);
-                        else
+                        int elementSizeInByte = Marshal.SizeOf(typeof(T));
+                        for (var row = 0; row < rows; row++)
                         {
-                            // Some drivers may add pitch to rows.
-                            // We need to copy each row separatly and skip trailing zeros.
-                            stream.Seek(startIndex, SeekOrigin.Begin);
+                            int i;
+                            for (i = row * rowSize / elementSizeInByte; i < (row + 1) * rowSize / elementSizeInByte; i++)
+                                data[i] = stream.Read<T>();
 
-                            int elementSizeInByte = Marshal.SizeOf(typeof(T));
-                            for (var row = 0; row < rows; row++)
-                            {
-                                int i;
-                                for (i = row * rowSize / elementSizeInByte; i < (row + 1) * rowSize / elementSizeInByte; i++)
-                                    data[i] = stream.Read<T>();
+                            if (i >= elementCount)
+                                break;
 
-                                if (i >= elementCount)
-                                    break;
-
-                                stream.Seek(databox.RowPitch - rowSize, SeekOrigin.Current);
-                            }
+                            stream.Seek(databox.RowPitch - rowSize, SeekOrigin.Current);
                         }
                     }
-                    finally
-                    {
-                        SharpDX.Utilities.Dispose(ref stream);
-                    }
+                    stream.Dispose();
                 }
             }
         }

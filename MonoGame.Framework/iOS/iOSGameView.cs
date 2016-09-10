@@ -106,9 +106,7 @@ namespace Microsoft.Xna.Framework {
 
 		private void Initialize ()
 		{
-            #if !TVOS
 			MultipleTouchEnabled = true;
-            #endif
 			Opaque = true;
 		}
 
@@ -219,28 +217,12 @@ namespace Microsoft.Xna.Framework {
 
 			_glapi.GenFramebuffers (1, ref _framebuffer);
 			_glapi.BindFramebuffer (All.Framebuffer, _framebuffer);
-
+			
 			// Create our Depth buffer. Color buffer must be the last one bound
-            var gdm = _platform.Game.Services.GetService(
-                typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager;
-            if (gdm != null)
-            {
-                var preferredDepthFormat = gdm.PreferredDepthStencilFormat;
-                if (preferredDepthFormat != DepthFormat.None)
-                {
-                    GL.GenRenderbuffers(1, out _depthbuffer);
-                    GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, _depthbuffer);
-                    var internalFormat = All.DepthComponent16;
-                    if (preferredDepthFormat == DepthFormat.Depth24)
-                        internalFormat = All.DepthComponent24Oes;
-                    else if (preferredDepthFormat == DepthFormat.Depth24Stencil8)
-                        internalFormat = All.Depth24Stencil8Oes;
-                    GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, (RenderbufferInternalFormat)internalFormat, viewportWidth, viewportHeight);
-                    GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferSlot.DepthAttachment, RenderbufferTarget.Renderbuffer, _depthbuffer);
-                    if (preferredDepthFormat == DepthFormat.Depth24Stencil8)
-                        GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferSlot.StencilAttachment, RenderbufferTarget.Renderbuffer, _depthbuffer);
-                }
-            }
+			GL.GenRenderbuffers(1, out _depthbuffer);
+			GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, _depthbuffer);
+            GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferInternalFormat.DepthComponent16, viewportWidth, viewportHeight);
+			GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferSlot.DepthAttachment, RenderbufferTarget.Renderbuffer, _depthbuffer);
 
 			_glapi.GenRenderbuffers(1, ref _colorbuffer);
 			_glapi.BindRenderbuffer(All.Renderbuffer, _colorbuffer);
@@ -317,14 +299,9 @@ namespace Microsoft.Xna.Framework {
 			_glapi.DeleteRenderbuffers (1, ref _colorbuffer);
 			_colorbuffer = 0;
 			
-            if (_depthbuffer != 0)
-            {
-			    _glapi.DeleteRenderbuffers (1, ref _depthbuffer);
-			    _depthbuffer = 0;
-            }
+			_glapi.DeleteRenderbuffers (1, ref _depthbuffer);
+			_depthbuffer = 0;
 		}
-
-        private static readonly All[] attachements = new All[] { All.DepthAttachment, All.StencilAttachment };
 
 		// FIXME: This logic belongs in GraphicsDevice.Present, not
 		//        here.  If it can someday be moved there, then the
@@ -337,8 +314,7 @@ namespace Microsoft.Xna.Framework {
             AssertValidContext ();
 
             this.MakeCurrent();
-            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, this._colorbuffer);
-            GraphicsDevice.FramebufferHelper.GLDiscardFramebufferExt(All.Framebuffer, 2, attachements);
+            GL.BindRenderbuffer (All.Renderbuffer, this._colorbuffer);
             __renderbuffergraphicsContext.SwapBuffers();
 		}
 
@@ -364,7 +340,7 @@ namespace Microsoft.Xna.Framework {
             if (gds == null || gds.GraphicsDevice == null)
                 return;
 
-			if (_framebuffer != 0)
+			if (_framebuffer + _colorbuffer + _depthbuffer != 0)
 				DestroyFramebuffer ();
 			if (__renderbuffergraphicsContext == null)
 				CreateContext();
@@ -381,7 +357,7 @@ namespace Microsoft.Xna.Framework {
                 
                 if (__renderbuffergraphicsContext == null)
                     CreateContext ();
-                if (_framebuffer == 0)
+                if (_framebuffer * _colorbuffer * _depthbuffer == 0)
                     CreateFramebuffer ();
             }
 		}

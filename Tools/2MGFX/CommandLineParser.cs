@@ -12,7 +12,7 @@ using System.Reflection;
 using System.ComponentModel;
 
 
-namespace TwoMGFX
+namespace Utilities
 {
     // Reusable, reflection based helper for parsing commandline options.
     //
@@ -248,7 +248,7 @@ namespace TwoMGFX
 
         // Used on an optionsObject field to rename the corresponding commandline option.
         [AttributeUsage(AttributeTargets.Field)]
-        public class NameAttribute : Attribute
+        public sealed class NameAttribute : Attribute
         {
             public NameAttribute(string name)
             {
@@ -263,18 +263,7 @@ namespace TwoMGFX
             }
 
             public string Name { get; private set; }
-            public string Description { get; protected set; }
-        }
-
-        [AttributeUsage(AttributeTargets.Field)]
-        public sealed class ProfileNameAttribute : NameAttribute
-        {
-            public ProfileNameAttribute()
-                : base("Profile")
-            {
-                var names = ShaderProfile.All.Select(p => p.Name);
-                Description = "\t - Must be one of the following: " + string.Join(", ", names);                               
-            }
+            public string Description { get; private set; }
         }
     }
 }

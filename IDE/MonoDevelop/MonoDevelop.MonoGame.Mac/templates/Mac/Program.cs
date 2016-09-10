@@ -29,8 +29,15 @@ namespace ${Namespace}
 	{
 		private static Game1 game;
 
-		public override void FinishedLaunching (NSObject notification)
+		public override void FinishedLaunching (MonoMac.Foundation.NSObject notification)
 		{
+			// Handle a Xamarin.Mac Upgrade
+			AppDomain.CurrentDomain.AssemblyResolve += (object sender, ResolveEventArgs a) =>  {
+			if (a.Name.StartsWith("MonoMac")) {
+				return typeof(MonoMac.AppKit.AppKitFramework).Assembly;
+			}
+			return null;
+			};
 			game = new Game1();
 			game.Run();
 		}

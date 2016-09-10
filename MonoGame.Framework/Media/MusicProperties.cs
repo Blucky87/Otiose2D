@@ -1,7 +1,8 @@
-﻿#if WINDOWS_STOREAPP || WINDOWS_UAP
+﻿#if WINDOWS_STOREAPP
 
 using System;
 using System.IO;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.Storage;
 

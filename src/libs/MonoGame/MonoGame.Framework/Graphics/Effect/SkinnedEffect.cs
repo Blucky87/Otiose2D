@@ -37,6 +37,8 @@ namespace Microsoft.Xna.Framework.Graphics
         EffectParameter worldViewProjParam;
         EffectParameter bonesParam;
 
+        int _shaderIndex = -1;
+
         #endregion
 
         #region Fields
@@ -67,6 +69,14 @@ namespace Microsoft.Xna.Framework.Graphics
         int weightsPerVertex = 4;
 
         EffectDirtyFlags dirtyFlags = EffectDirtyFlags.All;
+
+        static readonly byte[] Bytecode = LoadEffectResource(
+#if DIRECTX
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.SkinnedEffect.dx11.mgfxo"
+#else
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.SkinnedEffect.ogl.mgfxo"
+#endif
+        );            
 
         #endregion
 
@@ -379,7 +389,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Creates a new SkinnedEffect with default parameter settings.
         /// </summary>
         public SkinnedEffect(GraphicsDevice device)
-            : base(device, EffectResource.SkinnedEffect.Bytecode)
+            : base(device, Bytecode)
         {
             CacheEffectParameters(null);
 
@@ -483,7 +493,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Lazily computes derived parameter values immediately before applying the effect.
         /// </summary>
-        protected internal override void OnApply()
+        protected internal override bool OnApply()
         {
             // Recompute the world+view+projection matrix or fog vector?
             dirtyFlags = EffectHelpers.SetWorldViewProjAndFog(dirtyFlags, ref world, ref view, ref projection, ref worldView, fogEnabled, fogStart, fogEnd, worldViewProjParam, fogVectorParam);
@@ -528,8 +538,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 dirtyFlags &= ~EffectDirtyFlags.ShaderIndex;
 
-                CurrentTechnique = Techniques[shaderIndex];
+                if (_shaderIndex != shaderIndex)
+                {
+                    _shaderIndex = shaderIndex;
+                    CurrentTechnique = Techniques[_shaderIndex];
+                    return true;
+                }
             }
+
+            return false;
         }
 
 

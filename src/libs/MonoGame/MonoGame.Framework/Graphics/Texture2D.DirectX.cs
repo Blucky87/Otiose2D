@@ -13,7 +13,7 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 #endif
 
-#if WINDOWS_STOREAPP || WINDOWS_UAP
+#if WINDOWS_STOREAPP
 using Windows.Graphics.Imaging;
 using Windows.Storage.Streams;
 using System.Threading.Tasks;
@@ -33,6 +33,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _renderTarget = (type == SurfaceType.RenderTarget);
             _mipmap = mipmap;
+
+            // Create texture
+            GetTexture();
         }
 
         private void PlatformSetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
@@ -77,6 +80,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                 }
 
+                var box = new SharpDX.DataBox(dataPtr, GetPitch(w), 0);
+
                 var region = new SharpDX.Direct3D11.ResourceRegion();
                 region.Top = y;
                 region.Front = 0;
@@ -85,12 +90,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 region.Left = x;
                 region.Right = x + w;
 
-                
                 // TODO: We need to deal with threaded contexts here!
                 int subresourceIndex = CalculateSubresourceIndex(arraySlice, level);
                 var d3dContext = GraphicsDevice._d3dContext;
                 lock (d3dContext)
-                    d3dContext.UpdateSubresource(GetTexture(), subresourceIndex, region, dataPtr, GetPitch(w), 0);
+                    d3dContext.UpdateSubresource(box, GetTexture(), subresourceIndex, region);
             }
             finally
             {
@@ -123,7 +127,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var d3dContext = GraphicsDevice._d3dContext;
             using (var stagingTex = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc))
-            {
                 lock (d3dContext)
                 {
                     int subresourceIndex = CalculateSubresourceIndex(arraySlice, level);
@@ -145,41 +148,35 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
 
                     // Copy the data to the array.
-                    SharpDX.DataStream stream = null;
-                    try
+                    SharpDX.DataStream stream;
+                    var databox = d3dContext.MapSubresource(stagingTex, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out stream);
+
+                    var elementSize = _format.GetSize();
+                    var rowSize = elementSize * elementsInRow;
+                    if (rowSize == databox.RowPitch)
+                        stream.ReadRange(data, startIndex, elementCount);
+                    else
                     {
-                        var databox = d3dContext.MapSubresource(stagingTex, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out stream);
+                        // Some drivers may add pitch to rows.
+                        // We need to copy each row separatly and skip trailing zeros.
+                        stream.Seek(startIndex, SeekOrigin.Begin);
 
-                        var elementSize = _format.GetSize();
-                        var rowSize = elementSize * elementsInRow;
-                        if (rowSize == databox.RowPitch)
-                            stream.ReadRange(data, startIndex, elementCount);
-                        else
+                        int elementSizeInByte = Marshal.SizeOf(typeof(T));
+                        for (var row = 0; row < rows; row++)
                         {
-                            // Some drivers may add pitch to rows.
-                            // We need to copy each row separatly and skip trailing zeros.
-                            stream.Seek(0, SeekOrigin.Begin);
+                            int i;
+                            for (i = row * rowSize / elementSizeInByte; i < (row + 1) * rowSize / elementSizeInByte; i++)
+                                data[i] = stream.Read<T>();
 
-                            int elementSizeInByte = Marshal.SizeOf(typeof(T));
-                            for (var row = 0; row < rows; row++)
-                            {
-                                int i;
-                                for (i = row * rowSize / elementSizeInByte; i < (row + 1) * rowSize / elementSizeInByte; i++)
-                                    data[i + startIndex] = stream.Read<T>();
+                            if (i >= elementCount)
+                                break;
 
-                                if (i >= elementCount)
-                                    break;
-
-                                stream.Seek(databox.RowPitch - rowSize, SeekOrigin.Current);
-                            }
+                            stream.Seek(databox.RowPitch - rowSize, SeekOrigin.Current);
                         }
                     }
-                    finally
-                    {
-                        SharpDX.Utilities.Dispose( ref stream);
-                    }
+
+                    stream.Dispose();
                 }
-            }
         }
 
         private int CalculateSubresourceIndex(int arraySlice, int level)
@@ -234,7 +231,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSaveAsJpeg(Stream stream, int width, int height)
         {
-#if WINDOWS_STOREAPP || WINDOWS_UAP
+#if WINDOWS_STOREAPP
             SaveAsImage(BitmapEncoder.JpegEncoderId, stream, width, height);
 #endif
 #if WINDOWS_PHONE
@@ -243,12 +240,12 @@ namespace Microsoft.Xna.Framework.Graphics
             GetData(pixelData);
 
             //We Must convert from BGRA to RGBA
-            ConvertToRGBA(Height, Width, pixelData);
+            ConvertToRGBA(height, width, pixelData);
 
             var waitEvent = new ManualResetEventSlim(false);
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
-                var bitmap = new WriteableBitmap(Width, Height);
+                var bitmap = new WriteableBitmap(width, height);
                 System.Buffer.BlockCopy(pixelData, 0, bitmap.Pixels, 0, pixelData.Length);
                 bitmap.SaveJpeg(stream, width, height, 0, 100);
                 waitEvent.Set();
@@ -256,7 +253,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             waitEvent.Wait();
 #endif
-#if !WINDOWS_STOREAPP && !WINDOWS_PHONE && !WINDOWS_UAP
+#if !WINDOWS_STOREAPP && !WINDOWS_PHONE
             throw new NotImplementedException();
 #endif
         }
@@ -287,7 +284,8 @@ namespace Microsoft.Xna.Framework.Graphics
             pngWriter.Write(this, stream);
         }
 
-#if WINDOWS_STOREAPP || WINDOWS_UAP
+#if WINDOWS_STOREAPP
+
         private void SaveAsImage(Guid encoderId, Stream stream, int width, int height)
         {
             var pixelData = new byte[Width * Height * GraphicsExtensions.GetSize(Format)];
@@ -316,7 +314,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if !WINDOWS_PHONE
 
         [CLSCompliant(false)]
-        static SharpDX.Direct3D11.Texture2D CreateTex2DFromBitmap(SharpDX.WIC.BitmapSource bsource, GraphicsDevice device)
+        public static SharpDX.Direct3D11.Texture2D CreateTex2DFromBitmap(SharpDX.WIC.BitmapSource bsource, GraphicsDevice device)
         {
 
             SharpDX.Direct3D11.Texture2DDescription desc;

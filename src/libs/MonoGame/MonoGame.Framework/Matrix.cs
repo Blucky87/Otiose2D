@@ -1691,9 +1691,8 @@ namespace Microsoft.Xna.Framework
         /// <returns>The inverted matrix.</returns>
         public static Matrix Invert(Matrix matrix)
         {
-            Matrix result;
-            Invert(ref matrix, out result);
-            return result;
+            Invert(ref matrix, out matrix);
+            return matrix;
         }
 
         /// <summary>

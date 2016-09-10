@@ -4,7 +4,7 @@
 
 namespace MonoGame.Tools.Pipeline
 {
-    public interface IProjectObserver
+    interface IProjectObserver
     {
     }
 }

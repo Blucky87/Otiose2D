@@ -4,16 +4,8 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Drawing;
 
-#if PLATFORM_MACOS_LEGACY
 using MonoMac.Foundation;
 using MonoMac.AppKit;
-using RectF = System.Drawing.RectangleF;
-#else
-using Foundation;
-using AppKit;
-using RectF = CoreGraphics.CGRect;
-using PointF = CoreGraphics.CGPoint;
-#endif
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
@@ -31,8 +23,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 			// Something has happened with BeginSheet and needs to be looked into.
 			// Until then just use modal for now.
-			var frame = window.Frame;
-			var location = new PointF (gameWindow.Frame.Bottom, gameWindow.Frame.Left);
+			RectangleF frame = window.Frame;
+			PointF location = new PointF (gameWindow.Frame.Bottom, gameWindow.Frame.Left);
 			location = new PointF(gameWindow.Frame.Location.X, gameWindow.Frame.Location.Y);
 
 			window.SetFrameOrigin(location);

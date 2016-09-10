@@ -1,140 +1,150 @@
-// MonoGame - Copyright (C) The MonoGame Team
-// This file is subject to the terms and conditions defined in
-// file 'LICENSE.txt', which is part of this source code package.
+#region License
+/*
+Microsoft Public License (Ms-PL)
+MonoGame - Copyright © 2009 The MonoGame Team
 
+All rights reserved.
+
+This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
+accept the license, do not use the software.
+
+1. Definitions
+The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
+U.S. copyright law.
+
+A "contribution" is the original software, or any additions or changes to the software.
+A "contributor" is any person that distributes its contribution under this license.
+"Licensed patents" are a contributor's patent claims that read directly on its contribution.
+
+2. Grant of Rights
+(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
+each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
+(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
+each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
+
+3. Conditions and Limitations
+(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
+(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
+your patent license from such contributor to the software ends automatically.
+(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
+notices that are present in the software.
+(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
+a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
+code form, you may only do so under a license that complies with this license.
+(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
+or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
+permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
+purpose and non-infringement.
+*/
+#endregion License
 using System;
 
 namespace Microsoft.Xna.Framework.Input
 {
-    /// <summary>
-    /// Defines the buttons on gamepad.
-    /// </summary>
+    // Summary:
+    //     Enumerates input device buttons.
     [Flags]
     public enum Buttons
     {
-        /// <summary>
-        /// Directional pad up.
-        /// </summary>
+        // Summary:
+        //     Directional pad down
         DPadUp = 1,
-
-        /// <summary>
-        /// Directional pad down.
-        /// </summary>
+        //
+        // Summary:
+        //     Directional pad up
         DPadDown = 2,
-
-        /// <summary>
-        /// Directional pad left.
-        /// </summary>
+        //
+        // Summary:
+        //     Directional pad left
         DPadLeft = 4,
-
-        /// <summary>
-        /// Directional pad right.
-        /// </summary>
+        //
+        // Summary:
+        //     Directional pad right
         DPadRight = 8,
-
-        /// <summary>
-        /// START button.
-        /// </summary>
+        //
+        // Summary:
+        //     START button
         Start = 16,
-      
-        /// <summary>
-        /// BACK button.
-        /// </summary>
+        //
+        // Summary:
+        //     BACK button
         Back = 32,
-
-        /// <summary>
-        /// Left stick button (pressing the left stick).
-        /// </summary>
+        //
+        // Summary:
+        //     Left stick button (pressing the left stick)
         LeftStick = 64,
-
-        /// <summary>
-        /// Right stick button (pressing the right stick).
-        /// </summary>
+        //
+        // Summary:
+        //     Right stick button (pressing the right stick)
         RightStick = 128,
-
-        /// <summary>
-        /// Left bumper (shoulder) button.
-        /// </summary>
+        //
+        // Summary:
+        //     Left bumper (shoulder) button
         LeftShoulder = 256,
-
-        /// <summary>
-        /// Right bumper (shoulder) button.
-        /// </summary>
+        //
+        // Summary:
+        //     Right bumper (shoulder) button
         RightShoulder = 512,
-
-        /// <summary>
-        /// Big button.
-        /// </summary>    
+        //
+        // Summary:
+        //     Big button
         BigButton = 2048,
-       
-        /// <summary>
-        /// A button.
-        /// </summary>
+        //
+        // Summary:
+        //     A button
         A = 4096,
-
-        /// <summary>
-        /// B button.
-        /// </summary>
+        //
+        // Summary:
+        //     B button
         B = 8192,
-
-        /// <summary>
-        /// X button.
-        /// </summary>
+        //
+        // Summary:
+        //     X button
         X = 16384,
-
-        /// <summary>
-        /// Y button.
-        /// </summary>
-        Y = 32768,    
-
-        /// <summary>
-        /// Left stick is towards the left.
-        /// </summary>
+        //
+        // Summary:
+        //     Y button
+        Y = 32768,
+        //
+        // Summary:
+        //     Left stick is towards the left
         LeftThumbstickLeft = 2097152,
-
-        /// <summary>
-        /// Right trigger.
-        /// </summary>
+        //
+        // Summary:
+        //     Right trigger
         RightTrigger = 4194304,
-
-        /// <summary>
-        /// Left trigger.
-        /// </summary>
+        //
+        // Summary:
+        //     Left trigger
         LeftTrigger = 8388608,
-
-        /// <summary>
-        /// Right stick is towards up.
-        /// </summary>   
+        //
+        // Summary:
+        //     Right stick is towards up
         RightThumbstickUp = 16777216,
-
-        /// <summary>
-        /// Right stick is towards down.
-        /// </summary>   
+        //
+        // Summary:
+        //     Right stick is towards down
         RightThumbstickDown = 33554432,
-
-        /// <summary>
-        /// Right stick is towards the right.
-        /// </summary>
+        //
+        // Summary:
+        //     Right stick is towards the right
         RightThumbstickRight = 67108864,
-
-        /// <summary>
-        /// Right stick is towards the left.
-        /// </summary>
+        //
+        // Summary:
+        //     Right stick is towards the left
         RightThumbstickLeft = 134217728,
-
-        /// <summary>
-        /// Left stick is towards up.
-        /// </summary>  
+        //
+        // Summary:
+        //     Left stick is towards up
         LeftThumbstickUp = 268435456,
-
-        /// <summary>
-        /// Left stick is towards down.
-        /// </summary>  
+        //
+        // Summary:
+        //     Left stick is towards down
         LeftThumbstickDown = 536870912,
-
-        /// <summary>
-        /// Left stick is towards the right.
-        /// </summary>
-        LeftThumbstickRight = 1073741824
+        //
+        // Summary:
+        //     Left stick is towards the right
+        LeftThumbstickRight = 1073741824,
     }
+
 }

@@ -26,9 +26,13 @@ namespace Microsoft.Xna.Framework.Media
 
             SharpDX.MediaFoundation.MediaSource mediaSource;
             {
-                SourceResolver resolver = new SourceResolver();
+                SourceResolver resolver;
+                MediaFactory.CreateSourceResolver(out resolver);
 
-                ComObject source = resolver.CreateObjectFromURL(FilePath, SourceResolverFlags.MediaSource);
+                ObjectType otype;
+                ComObject source;
+                resolver.CreateObjectFromURL(FilePath, (int)SourceResolverFlags.MediaSource, null, out otype,
+                                                out source);
                 mediaSource = source.QueryInterface<SharpDX.MediaFoundation.MediaSource>();
                 resolver.Dispose();
                 source.Dispose();
@@ -55,8 +59,7 @@ namespace Microsoft.Xna.Framework.Media
                     TopologyNode outputNode;
                     MediaFactory.CreateTopologyNode(TopologyType.OutputNode, out outputNode);
 
-                    var typeHandler = desc.MediaTypeHandler;
-                    var majorType = typeHandler.MajorType;
+                    var majorType = desc.MediaTypeHandler.MajorType;
                     if (majorType != MediaTypeGuids.Audio)
                         throw new NotSupportedException("The song contains video data!");
 
@@ -70,8 +73,6 @@ namespace Microsoft.Xna.Framework.Media
 
                     sourceNode.Dispose();
                     outputNode.Dispose();
-                    typeHandler.Dispose();
-                    activate.Dispose();
                 }
 
                 desc.Dispose();

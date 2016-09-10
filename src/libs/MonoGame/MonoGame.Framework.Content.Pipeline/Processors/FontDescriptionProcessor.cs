@@ -4,11 +4,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using System.ComponentModel;
 using System.Linq;
 using SharpFont;
+using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using MonoGame.Framework.Content.Pipeline.Builder;
 using Glyph = Microsoft.Xna.Framework.Content.Pipeline.Graphics.Glyph;
@@ -82,10 +84,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 #endif
 
 			context.Logger.LogMessage ("Building Font {0}", fontName);
-            
-            // Get the platform specific texture profile.
-            var texProfile = TextureProfile.ForPlatform(context.TargetPlatform);
-
 			try {
 				if (!File.Exists(fontName)) {
 					throw new Exception(string.Format("Could not load {0}", fontName));
@@ -100,11 +98,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 					GlyphCropper.Crop(glyph);
 				}
 
-                // We need to know how to pack the glyphs.
-                bool requiresPot, requiresSquare;
-                texProfile.Requirements(context, TextureFormat, out requiresPot, out requiresSquare);
+			    var compressed = TextureFormat == TextureProcessorOutputFormat.DxtCompressed || TextureFormat == TextureProcessorOutputFormat.Compressed;
+                var systemBitmap = GlyphPacker.ArrangeGlyphs(glyphs, compressed, compressed);
 
-                var face = GlyphPacker.ArrangeGlyphs(glyphs, requiresPot, requiresSquare);
+				//systemBitmap.Save ("fontglyphs.png");
 
 				// Adjust line and character spacing.
 				lineSpacing += input.Spacing;
@@ -127,14 +124,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 						output.Kerning.Add(new Vector3(0, texRect.Width, 0));
 				}
 
-                output.Texture.Faces[0].Add(face);            
+                output.Texture.Faces[0].Add(systemBitmap.ToXnaBitmap(true));
+			    systemBitmap.Dispose();
+
+                if (compressed)
+                {
+                    GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, context, false, true, true);
+                }
 			}
 			catch(Exception ex) {
 				context.Logger.LogImportantMessage("{0}", ex.ToString());
 			}
-
-            // Perform the final texture conversion.
-            texProfile.ConvertTexture(context, output.Texture, TextureFormat, false, true);    
 
             return output;
         }
@@ -145,7 +145,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			IFontImporter importer;
 
 			var TrueTypeFileExtensions = new List<string> { ".ttf", ".ttc", ".otf" };
-			//var BitmapFileExtensions = new List<string> { ".bmp", ".png", ".gif" };
+			var BitmapFileExtensions = new List<string> { ".bmp", ".png", ".gif" };
 
 			string fileExtension = Path.GetExtension(fontName).ToLowerInvariant();
 
@@ -155,10 +155,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			//			}
 			//			else
 			//			{
-			if (!TrueTypeFileExtensions.Contains(fileExtension)) 
-                throw new PipelineException("Unknown file extension " + fileExtension);
-
-			importer = new SharpFontImporter();
+			if (TrueTypeFileExtensions.Contains (fileExtension)) 
+			{
+				importer = new SharpFontImporter ();
+			}
+			else 
+			{
+				//importer = new TrueTypeImporter();
+				importer = new SharpFontImporter ();
+			}
 
 			// Import the source font data.
 			importer.Import(options, fontName);

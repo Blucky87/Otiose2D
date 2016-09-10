@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework {
         /// </summary>
         public virtual bool AllowAltF4 { get { return _allowAltF4; } set { _allowAltF4 = value; } }
 
-#if (WINDOWS && !WINRT) || DESKTOPGL
+#if (WINDOWS && !WINRT) || LINUX
         /// <summary>
         /// The location of this window on the desktop, eg: global coordinate space
         /// which stretches across all screens.
@@ -38,14 +38,7 @@ namespace Microsoft.Xna.Framework {
 		public abstract string ScreenDeviceName { get; }
 
 		private string _title;
-        /// <summary>
-        /// Gets or sets the title of the game window.
-        /// </summary>
-        /// <remarks>
-        /// For Windows 8 and Windows 10 UWP this has no effect. For these platforms the title should be
-        /// set by using the DisplayName property found in the app manifest file.
-        /// </remarks>
-        public string Title {
+		public string Title {
 			get { return _title; }
 			set {
 				if (_title != value) {
@@ -89,7 +82,7 @@ namespace Microsoft.Xna.Framework {
 		public event EventHandler<EventArgs> OrientationChanged;
 		public event EventHandler<EventArgs> ScreenDeviceNameChanged;
 
-#if WINDOWS || WINDOWS_UAP || DESKTOPGL|| ANGLE
+#if WINDOWS || WINDOWS_UAP  || LINUX || ANGLE
 
         /// <summary>
 		/// Use this event to retrieve text for objects like textbox's.
@@ -146,7 +139,7 @@ namespace Microsoft.Xna.Framework {
 				ScreenDeviceNameChanged (this, EventArgs.Empty);
 		}
 
-#if WINDOWS || WINDOWS_UAP || DESKTOPGL || ANGLE
+#if WINDOWS || WINDOWS_UAP || LINUX || ANGLE
 		protected void OnTextInput(object sender, TextInputEventArgs e)
 		{
 			if (TextInput != null)

@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework.Media
         public static TimeSpan PlayPosition
         {
             get { return PlatformGetPlayPosition(); }
-#if (IOS && !TVOS) || ANDROID
+#if IOS || ANDROID
             set { PlatformSetPlayPosition(value); }
 #endif
         }
@@ -112,34 +112,25 @@ namespace Microsoft.Xna.Framework.Media
 
             State = MediaState.Paused;
         }
-
-        /// <summary>
-        /// Play clears the current playback queue, and then queues up the specified song for playback. 
-        /// Playback starts immediately at the beginning of the song.
-        /// </summary>
+		
+		/// <summary>
+		/// Play clears the current playback queue, and then queues up the specified song for playback. 
+		/// Playback starts immediately at the beginning of the song.
+		/// </summary>
         public static void Play(Song song)
-        {
-            Play(song, null);
-        }
-
-        /// <summary>
-        /// Play clears the current playback queue, and then queues up the specified song for playback. 
-        /// Playback starts immediately at the given position of the song.
-        /// </summary>
-        public static void Play(Song song, TimeSpan? startPosition)
         {
             var previousSong = _queue.Count > 0 ? _queue[0] : null;
             _queue.Clear();
             _numSongsInQueuePlayed = 0;
             _queue.Add(song);
-            _queue.ActiveSongIndex = 0;
+			_queue.ActiveSongIndex = 0;
             
-            PlaySong(song, startPosition);
+            PlaySong(song);
 
             if (previousSong != song && ActiveSongChanged != null)
                 ActiveSongChanged.Invoke(null, EventArgs.Empty);
         }
-
+		
 		public static void Play(SongCollection collection, int index = 0)
 		{
             _queue.Clear();
@@ -150,12 +141,12 @@ namespace Microsoft.Xna.Framework.Media
 			
 			_queue.ActiveSongIndex = index;
 			
-			PlaySong(_queue.ActiveSong, null);
+			PlaySong(_queue.ActiveSong);
 		}
 
-        private static void PlaySong(Song song, TimeSpan? startPosition)
+        private static void PlaySong(Song song)
         {
-            PlatformPlaySong(song, startPosition);
+            PlatformPlaySong(song);
             State = MediaState.Playing;
         }
 
@@ -240,7 +231,7 @@ namespace Microsoft.Xna.Framework.Media
 			var nextSong = _queue.GetNextSong(direction, IsShuffled);
 
             if (nextSong != null)
-                PlaySong(nextSong, null);
+                PlaySong(nextSong);
 
             if (ActiveSongChanged != null)
             {

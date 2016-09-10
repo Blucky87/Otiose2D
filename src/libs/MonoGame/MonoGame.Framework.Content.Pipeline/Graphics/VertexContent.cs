@@ -166,9 +166,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
                 result.VertexDeclaration.VertexElements.Add(new VertexElement(offset, format, usage, usageIndex));
                 offset += format.GetSize();
+                result.VertexDeclaration.VertexStride = offset;
             }
-
-            result.VertexDeclaration.VertexStride = offset;
             return offset;
         }
 

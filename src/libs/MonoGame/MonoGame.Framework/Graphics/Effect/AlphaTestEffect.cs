@@ -29,6 +29,8 @@ namespace Microsoft.Xna.Framework.Graphics
         EffectParameter fogVectorParam;
         EffectParameter worldViewProjParam;
 
+        int _shaderIndex;
+
         #endregion
 
         #region Fields
@@ -54,6 +56,16 @@ namespace Microsoft.Xna.Framework.Graphics
         bool isEqNe;
 
         EffectDirtyFlags dirtyFlags = EffectDirtyFlags.All;
+
+        static readonly byte[] Bytecode = LoadEffectResource(
+#if DIRECTX
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.dx11.mgfxo"
+#elif PSM
+            "MonoGame.Framework.PSMobile.PSSuite.Graphics.AlphaTestEffect.cgx" //FIXME: This shader is totally incomplete
+#else
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.ogl.mgfxo"
+#endif
+        );
 
         #endregion
 
@@ -259,7 +271,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Creates a new AlphaTestEffect with default parameter settings.
         /// </summary>
         public AlphaTestEffect(GraphicsDevice device)
-            : base(device, EffectResource.AlphaTestEffect.Bytecode)
+            : base(device, Bytecode)
         {
             CacheEffectParameters();
         }
@@ -315,7 +327,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Lazily computes derived parameter values immediately before applying the effect.
         /// </summary>
-        protected internal override void OnApply()
+        protected internal override bool OnApply()
         {
             // Recompute the world+view+projection matrix or fog vector?
             dirtyFlags = EffectHelpers.SetWorldViewProjAndFog(dirtyFlags, ref world, ref view, ref projection, ref worldView, fogEnabled, fogStart, fogEnd, worldViewProjParam, fogVectorParam);
@@ -431,8 +443,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 dirtyFlags &= ~EffectDirtyFlags.ShaderIndex;
 
-                CurrentTechnique = Techniques[shaderIndex];
+                if (_shaderIndex != shaderIndex)
+                {
+                    _shaderIndex = shaderIndex;
+                    CurrentTechnique = Techniques[_shaderIndex];
+                    return true;
+                }
             }
+
+            return false;
         }
 
 

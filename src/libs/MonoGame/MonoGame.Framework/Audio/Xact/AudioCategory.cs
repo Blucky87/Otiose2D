@@ -12,71 +12,85 @@ namespace Microsoft.Xna.Framework.Audio
     /// <summary>
     /// Provides functionality for manipulating multiple sounds at a time.
     /// </summary>
-    public struct AudioCategory : IEquatable<AudioCategory>
-    {
-        readonly string _name;
-        readonly AudioEngine _engine;
-        readonly List<XactSound> _sounds;
+	public struct AudioCategory : IEquatable<AudioCategory>
+	{
+		string name;
+		AudioEngine engine;
 
-        // This is a bit gross, but we use an array here
+        // Thisis a bit gross, but we use an array here
         // instead of a field since AudioCategory is a struct
         // This allows us to save _volume when the user
         // holds onto a reference of AudioCategory, or when a cue
         // is created/loaded after the volume's already been set.
-        internal float[] _volume;
+		internal float[] _volume;
+		internal bool isBackgroundMusic;
+		internal bool isPublic;
 
-        internal bool isBackgroundMusic;
-        internal bool isPublic;
+		internal bool instanceLimit;
+		internal int maxInstances;
 
-        internal bool instanceLimit;
-        internal int maxInstances;
-        internal MaxInstanceBehavior InstanceBehavior;
+		List<XactSound> sounds;
 
-        internal CrossfadeType fadeType;
-        internal float fadeIn;
-        internal float fadeOut;
+		//insatnce limiting behaviour
+		internal enum MaxInstanceBehaviour {
+			FailToPlay,
+			Queue,
+			ReplaceOldest,
+			ReplaceQuietest,
+			ReplaceLowestPriority,
+		}
+		internal MaxInstanceBehaviour instanceBehaviour;
 
-        
-        internal AudioCategory (AudioEngine audioengine, string name, BinaryReader reader)
-        {
-            Debug.Assert(audioengine != null);
+		internal enum CrossfadeType {
+			Linear,
+			Logarithmic,
+			EqualPower,
+		}
+		internal CrossfadeType fadeType;
+		internal float fadeIn;
+		internal float fadeOut;
+
+		
+		internal AudioCategory (AudioEngine audioengine, string name, BinaryReader reader)
+		{
+		    Debug.Assert(audioengine != null);
             Debug.Assert(!string.IsNullOrEmpty(name));
 
-            _sounds = new List<XactSound>();
-            _name = name;
-            _engine = audioengine;
+			this.sounds = new List<XactSound>();
+			this.name = name;
+			engine = audioengine;
 
-            maxInstances = reader.ReadByte ();
-            instanceLimit = maxInstances != 0xff;
+			maxInstances = reader.ReadByte ();
+			instanceLimit = maxInstances != 0xff;
 
-            fadeIn = (reader.ReadUInt16 () / 1000f);
-            fadeOut = (reader.ReadUInt16 () / 1000f);
+			fadeIn = (reader.ReadUInt16 () / 1000f);
+			fadeOut = (reader.ReadUInt16 () / 1000f);
 
-            byte instanceFlags = reader.ReadByte ();
-            fadeType = (CrossfadeType)(instanceFlags & 0x7);
-            InstanceBehavior = (MaxInstanceBehavior)(instanceFlags >> 3);
+			byte instanceFlags = reader.ReadByte ();
+			fadeType = (CrossfadeType)(instanceFlags & 0x7);
+			instanceBehaviour = (MaxInstanceBehaviour)(instanceFlags >> 3);
 
-            reader.ReadUInt16 (); //unkn
+			reader.ReadUInt16 (); //unkn
 
             var volume = XactHelpers.ParseVolumeFromDecibels(reader.ReadByte());
             _volume = new float[1] { volume };
 
-            byte visibilityFlags = reader.ReadByte ();
-            isBackgroundMusic = (visibilityFlags & 0x1) != 0;
-            isPublic = (visibilityFlags & 0x2) != 0;
-        }
+			byte visibilityFlags = reader.ReadByte ();
+			isBackgroundMusic = (visibilityFlags & 0x1) != 0;
+			isPublic = (visibilityFlags & 0x2) != 0;
+		}
 
-        internal void AddSound(XactSound sound)
-        {
-            _sounds.Add(sound);
-        }
+		internal void AddSound(XactSound sound)
+		{
+			sounds.Add(sound);
+		}
 
         internal int GetPlayingInstanceCount()
         {
             var sum = 0;
-            for (var i = 0; i < _sounds.Count; i++)
+            for (var i = 0; i < sounds.Count; i++)
             {
-                if (_sounds[i].Playing)
+                if (sounds[i].Playing)
                     sum++;
             }
             return sum;
@@ -84,10 +98,10 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal XactSound GetOldestInstance()
         {
-            for (var i = 0; i < _sounds.Count; i++)
+            for (var i = 0; i < sounds.Count; i++)
             {
-                if (_sounds[i].Playing)
-                    return _sounds[i];
+                if (sounds[i].Playing)
+                    return sounds[i];
             }
             return null;
         }
@@ -95,45 +109,42 @@ namespace Microsoft.Xna.Framework.Audio
         /// <summary>
         /// Gets the category's friendly name.
         /// </summary>
-        public string Name { get { return _name; } }
+		public string Name { get { return name; } }
 
         /// <summary>
         /// Pauses all associated sounds.
         /// </summary>
-        public void Pause ()
-        {
-            foreach (var sound in _sounds)
-                sound.Pause();
-        }
+		public void Pause ()
+		{
+			foreach (var sound in sounds)
+				sound.Pause();
+		}
 
         /// <summary>
         /// Resumes all associated paused sounds.
         /// </summary>
-        public void Resume ()
-        {
-            foreach (var sound in _sounds)
-                sound.Resume();
-        }
+		public void Resume ()
+		{
+			foreach (var sound in sounds)
+				sound.Resume();
+		}
 
         /// <summary>
         /// Stops all associated sounds.
         /// </summary>
         public void Stop(AudioStopOptions options)
-        {
-            foreach (var sound in _sounds)
+		{
+			foreach (var sound in sounds)
                 sound.Stop(options);
-        }
+		}
 
-        public void SetVolume(float volume)
+		public void SetVolume(float volume)
         {
-            if (volume < 0)
-                throw new ArgumentException("The volume must be positive.");
-            
             _volume[0] = volume;
 
-            foreach (var sound in _sounds)
-                sound.UpdateCategoryVolume(volume);
-        }
+			foreach (var sound in sounds)
+				sound.UpdateCategoryVolume(volume);
+		}
 
         /// <summary>
         /// Determines whether two AudioCategory instances are equal.
@@ -143,7 +154,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// <returns>true if the objects are equal or false if they aren't.</returns>
         public static bool operator ==(AudioCategory first, AudioCategory second)
         {
-            return first._engine == second._engine && first._name.Equals(second._name, StringComparison.Ordinal);
+            return first.engine == second.engine && first.name.Equals(second.name, StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -153,19 +164,19 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="second">Second AudioCategory instance to compare.</param>
         /// <returns>true if the objects are not equal or false if they are.</returns>
         public static bool operator !=(AudioCategory first, AudioCategory second)
-        {
-            return first._engine != second._engine || !first._name.Equals(second._name, StringComparison.Ordinal);
-        }
+	    {
+            return first.engine != second.engine || !first.name.Equals(second.name, StringComparison.Ordinal);
+	    }
 
         /// <summary>
         /// Determines whether two AudioCategory instances are equal.
         /// </summary>
         /// <param name="other">AudioCategory to compare with this instance.</param>
         /// <returns>true if the objects are equal or false if they aren't</returns>
-        public bool Equals(AudioCategory other)
-        {
-            return _engine == other._engine && _name.Equals(other._name, StringComparison.Ordinal);
-        }
+	    public bool Equals(AudioCategory other)
+		{
+            return engine == other.engine && name.Equals(other.name, StringComparison.Ordinal);
+		}
 
         /// <summary>
         /// Determines whether two AudioCategory instances are equal.
@@ -177,7 +188,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (obj is AudioCategory)
             {
                 var other = (AudioCategory)obj;
-                return _engine == other._engine && _name.Equals(other._name, StringComparison.Ordinal);
+                return engine == other.engine && name.Equals(other.name, StringComparison.Ordinal);
             }
 
             return false;
@@ -189,7 +200,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// <returns>Hash code for this object.</returns>
         public override int GetHashCode()
         {
-            return _name.GetHashCode() ^ _engine.GetHashCode();
+            return name.GetHashCode() ^ engine.GetHashCode();
         }
 
         /// <summary>
@@ -198,8 +209,8 @@ namespace Microsoft.Xna.Framework.Audio
         /// <returns>Friendly name of the AudioCategory</returns>
         public override string ToString()
         {
-            return _name;
+            return name;
         }
-    }
+	}
 }
 

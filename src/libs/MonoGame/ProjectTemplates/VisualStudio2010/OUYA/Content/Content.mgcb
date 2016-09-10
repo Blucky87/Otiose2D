@@ -3,7 +3,7 @@
 
 /outputDir:bin/Ouya
 /intermediateDir:obj/Ouya
-/platform:Android
+/platform:Ouya
 /config:
 /profile:Reach
 /compress:False

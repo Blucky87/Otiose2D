@@ -2,16 +2,11 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-#if MONOMAC && PLATFORM_MACOS_LEGACY
+#if MONOMAC
 using MonoMac.OpenGL;
-#endif
-#if (MONOMAC && !PLATFORM_MACOS_LEGACY)
+#elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#endif
-#if DESKTOPGL
-using OpenGL;
-#endif
-#if GLES
+#elif GLES
 using OpenTK.Graphics.ES20;
 #endif
 

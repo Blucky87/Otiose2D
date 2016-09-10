@@ -7,63 +7,49 @@ using System.IO;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    class XactClip
-    {
+	class XactClip
+	{
         private readonly float _defaultVolume;
         private float _volumeScale;
         private float _volume;
 
-        private readonly ClipEvent[] _events;
+		private readonly ClipEvent[] _events;
         private float _time;
         private int _nextEvent;
 
-        internal readonly bool FilterEnabled;
-        internal readonly FilterMode FilterMode;
-        internal readonly float FilterQ;
-        internal readonly ushort FilterFrequency;
-
-        internal readonly bool UseReverb;
-
-        public XactClip (SoundBank soundBank, BinaryReader clipReader, bool useReverb)
-        {
-#pragma warning disable 0219
+		public XactClip (SoundBank soundBank, BinaryReader clipReader)
+		{
             State = SoundState.Stopped;
 
-            UseReverb = useReverb;
-
-            var volumeDb = XactHelpers.ParseDecibels(clipReader.ReadByte());
+		    var volumeDb = XactHelpers.ParseDecibels(clipReader.ReadByte());
             _defaultVolume = XactHelpers.ParseVolumeFromDecibels(volumeDb);
             var clipOffset = clipReader.ReadUInt32();
 
-            // Read the filter info.
-            var filterQAndFlags = clipReader.ReadUInt16();
-            FilterEnabled = (filterQAndFlags & 1) == 1;
-            FilterMode = (FilterMode)((filterQAndFlags >> 1) & 3);
-            FilterQ = (filterQAndFlags >> 3) * 0.01f;
-            FilterFrequency = clipReader.ReadUInt16();
+            // Unknown!
+            clipReader.ReadUInt32();
 
-            var oldPosition = clipReader.BaseStream.Position;
-            clipReader.BaseStream.Seek(clipOffset, SeekOrigin.Begin);
-            
-            var numEvents = clipReader.ReadByte();
-            _events = new ClipEvent[numEvents];
-            
-            for (var i=0; i<numEvents; i++) 
+			var oldPosition = clipReader.BaseStream.Position;
+			clipReader.BaseStream.Seek(clipOffset, SeekOrigin.Begin);
+			
+			var numEvents = clipReader.ReadByte();
+			_events = new ClipEvent[numEvents];
+			
+			for (var i=0; i<numEvents; i++) 
             {
-                var eventInfo = clipReader.ReadUInt32();
+				var eventInfo = clipReader.ReadUInt32();
                 var randomOffset = clipReader.ReadUInt16() * 0.001f;
 
                 // TODO: eventInfo still has 11 bits that are unknown!
-                var eventId = eventInfo & 0x1F;
+				var eventId = eventInfo & 0x1F;
                 var timeStamp = ((eventInfo >> 5) & 0xFFFF) * 0.001f;
                 var unknown = eventInfo >> 21;
 
-                switch (eventId) {
+				switch (eventId) {
                 case 0:
                     // Stop Event
                     throw new NotImplementedException("Stop event");
 
-                case 1:
+				case 1:
                 {
                     // Unknown!
                     clipReader.ReadByte();
@@ -74,9 +60,9 @@ namespace Microsoft.Xna.Framework.Audio
                     var panEnabled = (eventFlags & 0x02) == 0x02;
                     var useCenterSpeaker = (eventFlags & 0x04) == 0x04;
 
-                    int trackIndex = clipReader.ReadUInt16();
+					int trackIndex = clipReader.ReadUInt16();
                     int waveBankIndex = clipReader.ReadByte();					
-                    var loopCount = clipReader.ReadByte();
+					var loopCount = clipReader.ReadByte();
                     var panAngle = clipReader.ReadUInt16() / 100.0f;
                     var panArc = clipReader.ReadUInt16() / 100.0f;
                     
@@ -92,11 +78,10 @@ namespace Microsoft.Xna.Framework.Audio
                         VariationType.Ordered, 
                         null,
                         null,
-                        null,
                         loopCount,
                         false);
 
-                    break;
+					break;
                 }
 
                 case 3:
@@ -155,7 +140,6 @@ namespace Microsoft.Xna.Framework.Audio
                         variationType,
                         null,
                         null,
-                        null,
                         loopCount,
                         newWaveOnLoop);
 
@@ -188,30 +172,13 @@ namespace Microsoft.Xna.Framework.Audio
                     var maxVolume = XactHelpers.ParseVolumeFromDecibels(clipReader.ReadByte());
 
                     // Filter variation
-                    var minFrequency = clipReader.ReadSingle();
-                    var maxFrequency = clipReader.ReadSingle();
+                    var minFrequency = clipReader.ReadSingle() / 1000.0f;
+                    var maxFrequency = clipReader.ReadSingle() / 1000.0f;
                     var minQ = clipReader.ReadSingle();
                     var maxQ = clipReader.ReadSingle();
 
                     // Unknown!
                     clipReader.ReadByte();
-
-                    var variationFlags = clipReader.ReadByte();
-
-                    // Enable pitch variation
-                    Vector2? pitchVar = null;
-                    if ((variationFlags & 0x10) == 0x10)
-                        pitchVar = new Vector2(minPitch, maxPitch - minPitch);
-
-                    // Enable volume variation
-                    Vector2? volumeVar = null;
-                    if ((variationFlags & 0x20) == 0x20)
-                        volumeVar = new Vector2(minVolume, maxVolume - minVolume);
-
-                    // Enable filter variation
-                    Vector4? filterVar = null;
-                    if ((variationFlags & 0x40) == 0x40)
-                        filterVar = new Vector4(minFrequency, maxFrequency - minFrequency, minQ, maxQ - minQ);
 
                     _events[i] = new PlayWaveEvent(
                         this,
@@ -223,9 +190,8 @@ namespace Microsoft.Xna.Framework.Audio
                         null,
                         0,
                         VariationType.Ordered,
-                        volumeVar,
-                        pitchVar, 
-                        filterVar,
+                        new Vector2(minVolume, maxVolume - minVolume),
+                        new Vector2(minPitch, maxPitch - minPitch), 
                         loopCount,
                         false);
 
@@ -256,8 +222,8 @@ namespace Microsoft.Xna.Framework.Audio
                     var maxVolume = XactHelpers.ParseVolumeFromDecibels(clipReader.ReadByte());
 
                     // Filter variation range
-                    var minFrequency = clipReader.ReadSingle();
-                    var maxFrequency = clipReader.ReadSingle();
+                    var minFrequency = clipReader.ReadSingle() / 1000.0f;
+                    var maxFrequency = clipReader.ReadSingle() / 1000.0f;
                     var minQ = clipReader.ReadSingle();
                     var maxQ = clipReader.ReadSingle();
 
@@ -323,7 +289,6 @@ namespace Microsoft.Xna.Framework.Audio
                         variationType,
                         volumeVar,
                         pitchVar, 
-                        filterVar,
                         loopCount,
                         newWaveOnLoop);
 
@@ -365,14 +330,13 @@ namespace Microsoft.Xna.Framework.Audio
                     // Marker Event
                     throw new NotImplementedException("Marker event");
 
-                default:
+				default:
                     throw new NotSupportedException("Unknown event " + eventId);
-                }
-            }
-            
-            clipReader.BaseStream.Seek (oldPosition, SeekOrigin.Begin);
-#pragma warning restore 0219
-        }
+				}
+			}
+			
+			clipReader.BaseStream.Seek (oldPosition, SeekOrigin.Begin);
+		}
 
         internal void Update(float dt)
         {
@@ -413,45 +377,36 @@ namespace Microsoft.Xna.Framework.Audio
                     evt.SetFade(fadeInDuration, fadeOutDuration);
             }
         }
-        
-        internal void UpdateState(float volume, float pitch, float reverbMix, float? filterFrequency, float? filterQFactor)
-        {
-            _volumeScale = volume;
-            var trackVolume = _volume * _volumeScale;
-
-            foreach (var evt in _events)
-                evt.SetState(trackVolume, pitch, reverbMix, filterFrequency, filterQFactor);
-        }
-
-        public void Play()
-        {
-            _time = 0.0f;
+		
+		public void Play()
+		{
+		    _time = 0.0f;
             _nextEvent = 0;
-            SetVolume(_defaultVolume);
+		    SetVolume(_defaultVolume);
             State = SoundState.Playing; 
             Update(0);
         }
 
-        public void Resume()
-        {
+		public void Resume()
+		{
             foreach (var evt in _events)
                 evt.Resume();
 
             State = SoundState.Playing;
-        }
-        
-        public void Stop()
+		}
+		
+		public void Stop()
         {
             foreach (var evt in _events)
                 evt.Stop();
 
             State = SoundState.Stopped;
         }
-        
-        public void Pause()
+		
+		public void Pause()
         {
-            foreach (var evt in _events)
-                evt.Pause();
+		    foreach (var evt in _events)
+		        evt.Pause();
 
             State = SoundState.Paused;
         }
@@ -465,7 +420,7 @@ namespace Microsoft.Xna.Framework.Audio
         public void SetVolumeScale(float volume)
         {
             _volumeScale = volume;
-            UpdateVolumes();
+		    UpdateVolumes();
         }
 
         /// <summary>
@@ -478,17 +433,17 @@ namespace Microsoft.Xna.Framework.Audio
             UpdateVolumes();
         }
 
-        private void UpdateVolumes()
-        {
+	    private void UpdateVolumes()
+	    {
             var volume = _volume * _volumeScale;
             foreach (var evt in _events)
                 evt.SetTrackVolume(volume);
-        }
+	    }
 
-        public void SetPan(float pan)
+        public void Apply3D(AudioListener listener, AudioEmitter emitter)
         {
             foreach (var evt in _events)
-                evt.SetTrackPan(pan);
+                evt.Apply3D(listener, emitter);
         }
     }
 }

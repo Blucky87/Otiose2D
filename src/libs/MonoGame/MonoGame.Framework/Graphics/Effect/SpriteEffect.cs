@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Graphics
     /// <summary>
     /// The default effect used by SpriteBatch.
     /// </summary>
-    public class SpriteEffect : Effect
+    internal class SpriteEffect : Effect
     {
         #region Effect Parameters
 
@@ -18,13 +18,23 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #endregion
 
+        static internal readonly byte[] Bytecode = LoadEffectResource(
+#if DIRECTX
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.dx11.mgfxo"
+#elif PSM
+            "Microsoft.Xna.Framework.PSSuite.Graphics.Resources.SpriteEffect.cgx" //FIXME: This shader is totally incomplete
+#else
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.ogl.mgfxo"
+#endif
+        );
+
         #region Methods
 
         /// <summary>
         /// Creates a new SpriteEffect.
         /// </summary>
         public SpriteEffect(GraphicsDevice device)
-            : base(device, EffectResource.SpriteEffect.Bytecode)
+            : base(device, Bytecode)
         {
             CacheEffectParameters();
         }
@@ -59,7 +69,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Lazily computes derived parameter values immediately before applying the effect.
         /// </summary>
-        protected internal override void OnApply()
+        protected internal override bool OnApply()
         {
             var viewport = GraphicsDevice.Viewport;
 
@@ -67,6 +77,8 @@ namespace Microsoft.Xna.Framework.Graphics
             var halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
 
             matrixParam.SetValue(halfPixelOffset * projection);
+
+            return false;
         }
 
 

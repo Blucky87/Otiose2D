@@ -27,9 +27,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void PlatformSetSamplers(GraphicsDevice device)
         {
-            if (_applyToVertexStage && !device.GraphicsCapabilities.SupportsVertexTextures)
-                return;
-
             // Skip out if nothing has changed.
             if (_d3dDirty == 0)
                 return;

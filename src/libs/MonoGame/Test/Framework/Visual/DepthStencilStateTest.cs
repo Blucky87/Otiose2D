@@ -82,7 +82,7 @@ namespace MonoGame.Tests.Visual
         {
             var cube = new Simple3DCubeComponent(Game);
 
-            Game.PreInitializeWith += (sender, e) =>
+            Game.InitializeWith += (sender, e) =>
             {
                 cube.Initialize();
             };
@@ -112,7 +112,7 @@ namespace MonoGame.Tests.Visual
         {
             var cube = new Simple3DCubeComponent(Game);
 
-            Game.PreInitializeWith += (sender, e) =>
+            Game.InitializeWith += (sender, e) =>
             {
                 cube.Initialize();
             };

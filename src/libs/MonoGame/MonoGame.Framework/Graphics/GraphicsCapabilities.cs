@@ -6,22 +6,11 @@ using System;
 using System.Collections.Generic;
 #if OPENGL
 #if MONOMAC
-#if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
-using GetParamName = MonoMac.OpenGL.All;
-using GetPName = MonoMac.OpenGL.GetPName;
-#else
-using OpenTK.Graphics.OpenGL;
-using GetParamName = OpenTK.Graphics.OpenGL.All;
-using GetPName = OpenTK.Graphics.OpenGL.GetPName;
-#endif
 #elif GLES
 using OpenTK.Graphics.ES20;
-using GetParamName = OpenTK.Graphics.ES20.All;
-using GetPName = OpenTK.Graphics.ES20.GetPName;
 #else
-using OpenGL;
-using GetParamName = OpenGL.GetPName;
+using OpenTK.Graphics.OpenGL;
 #endif
 #endif
 
@@ -112,8 +101,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal bool SupportsDepthClamp { get; private set; }
 
-        internal bool SupportsVertexTextures { get; private set; }
-
         internal void Initialize(GraphicsDevice device)
         {
 			SupportsNonPowerOfTwo = GetNonPowerOfTwo(device);
@@ -157,9 +144,7 @@ namespace Microsoft.Xna.Framework.Graphics
             SupportsFramebufferObjectARB = true; // always supported on GLES 2.0+
             SupportsFramebufferObjectEXT = false;
 #else
-            // if we're on GL 3.0+, frame buffer extensions are guaranteed to be present, but extensions may be missing
-            // it is then safe to assume that GL_ARB_framebuffer_object is present so that the standard function are loaded
-            SupportsFramebufferObjectARB = device.glMajorVersion >= 3 || device._extensions.Contains("GL_ARB_framebuffer_object");
+            SupportsFramebufferObjectARB = device._extensions.Contains("GL_ARB_framebuffer_object");
             SupportsFramebufferObjectEXT = device._extensions.Contains("GL_EXT_framebuffer_object");
 #endif
 #endif
@@ -169,11 +154,7 @@ namespace Microsoft.Xna.Framework.Graphics
             int anisotropy = 0;
             if (SupportsTextureFilterAnisotropic)
             {
-#if __IOS__
-                GL.GetInteger ((GetPName)All.MaxTextureMaxAnisotropyExt, out anisotropy);
-#else
-                GL.GetInteger((GetPName)GetParamName.MaxTextureMaxAnisotropyExt, out anisotropy);
-#endif
+                GL.GetInteger((GetPName)All.MaxTextureMaxAnisotropyExt, out anisotropy);
                 GraphicsExtensions.CheckGLError();
             }
             MaxTextureAnisotropy = anisotropy;
@@ -202,12 +183,6 @@ namespace Microsoft.Xna.Framework.Graphics
             SupportsDepthClamp = device.GraphicsProfile == GraphicsProfile.HiDef;
 #elif OPENGL
             SupportsDepthClamp = device._extensions.Contains("GL_ARB_depth_clamp");
-#endif
-
-#if DIRECTX
-            SupportsVertexTextures = device.GraphicsProfile == GraphicsProfile.HiDef;
-#elif OPENGL
-            SupportsVertexTextures = false; // For now, until we implement vertex textures in OpenGL.
 #endif
         }
 

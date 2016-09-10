@@ -6,14 +6,9 @@ using System;
 using System.Diagnostics;
 
 #if MONOMAC
-#if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
-#else
+#elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#endif
-#elif DESKTOPGL
-using OpenGL;
-using ExtTextureFilterAnisotropic = OpenGL.TextureParameterName;
 #elif GLES
 using OpenTK.Graphics.ES20;
 #endif
@@ -199,7 +194,7 @@ namespace Microsoft.Xna.Framework.Graphics
       case TextureAddressMode.Wrap:
         return (int)TextureWrapMode.Repeat;
       case TextureAddressMode.Mirror:
-        return (int)TextureWrapMode.MirroredRepeat;
+        return (int)All.MirroredRepeat;
 #if !GLES
       case TextureAddressMode.Border:
         return (int)TextureWrapMode.ClampToBorder;

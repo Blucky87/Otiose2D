@@ -36,10 +36,9 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
 #if DIRECTX
-        [Test]
-        public void TestPreprocessor()
+        [TestCase("Assets/Effects/PreprocessorTest.fx")]
+        public void TestPreprocessor(string effectFile)
         {
-            var effectFile = "Assets/Effects/PreprocessorTest.fx";
             var effectCode = File.ReadAllText(effectFile);
             var fullPath = Path.GetFullPath(effectFile);
 
@@ -51,7 +50,7 @@ namespace MonoGame.Tests.ContentPipeline
             }, mgDependencies, new TestEffectCompilerOutput());
 
             Assert.That(mgDependencies, Has.Count.EqualTo(1));
-            Assert.That(Path.GetFileName(mgDependencies[0]), Is.EqualTo("PreprocessorInclude.fxh"));
+            Assert.That(Path.GetFileName(mgDependencies[0]), Is.EqualTo("include.fxh"));
 
             Assert.That(mgPreprocessed, Is.Not.StringContaining("Foo"));
             Assert.That(mgPreprocessed, Is.StringContaining("Bar"));
@@ -59,9 +58,6 @@ namespace MonoGame.Tests.ContentPipeline
 
             Assert.That(mgPreprocessed, Is.StringContaining("FOO"));
             Assert.That(mgPreprocessed, Is.Not.StringContaining("BAR"));
-
-            // Check that we can actually compile this file.
-            BuildEffect(effectFile, TargetPlatform.Windows);
         }
 
         private class TestEffectCompilerOutput : IEffectCompilerOutput

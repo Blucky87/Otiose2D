@@ -1,23 +1,21 @@
-// MonoGame - Copyright (C) The MonoGame Team
-// This file is subject to the terms and conditions defined in
-// file 'LICENSE.txt', which is part of this source code package.
-
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
 	// Helper for arranging many small bitmaps onto a single larger surface.
 	internal static class GlyphPacker
 	{
-		public static BitmapContent ArrangeGlyphs(Glyph[] sourceGlyphs, bool requirePOT, bool requireSquare)
+		public static Bitmap ArrangeGlyphs(Glyph[] sourceGlyphs, bool requirePOT, bool requireSquare)
 		{
 			// Build up a list of all the glyphs needing to be arranged.
-			var glyphs = new List<ArrangedGlyph>();
+			List<ArrangedGlyph> glyphs = new List<ArrangedGlyph>();
 
 			for (int i = 0; i < sourceGlyphs.Length; i++)
 			{
-				var glyph = new ArrangedGlyph();
+				ArrangedGlyph glyph = new ArrangedGlyph();
 
 				glyph.Source = sourceGlyphs[i];
 
@@ -46,8 +44,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			// Create the merged output bitmap.
 			outputHeight = MakeValidTextureSize(outputHeight, requirePOT);
 
-			if (requireSquare)
-            {
+			if (requireSquare) {
 				outputHeight = Math.Max (outputWidth, outputHeight);
 				outputWidth = outputHeight;
 			}
@@ -55,18 +52,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			return CopyGlyphsToOutput(glyphs, outputWidth, outputHeight);
 		}
 
+
 		// Once arranging is complete, copies each glyph to its chosen position in the single larger output bitmap.
-		static BitmapContent CopyGlyphsToOutput(List<ArrangedGlyph> glyphs, int width, int height)
+		static Bitmap CopyGlyphsToOutput(List<ArrangedGlyph> glyphs, int width, int height)
 		{
-            var output = new PixelBitmapContent<Color>(width, height);
+			Bitmap output = new Bitmap(width, height, PixelFormat.Format32bppArgb);
 
-			foreach (var glyph in glyphs)
+			foreach (ArrangedGlyph glyph in glyphs)
 			{
-				var sourceGlyph = glyph.Source;
-				var sourceRegion = sourceGlyph.Subrect;
-				var destinationRegion = new Rectangle(glyph.X + 1, glyph.Y + 1, sourceRegion.Width, sourceRegion.Height);
+				Glyph sourceGlyph = glyph.Source;
+				System.Drawing.Rectangle sourceRegion = sourceGlyph.Subrect;
+				System.Drawing.Rectangle destinationRegion = new System.Drawing.Rectangle(glyph.X + 1, glyph.Y + 1, sourceRegion.Width, sourceRegion.Height);
 
-				BitmapContent.Copy(sourceGlyph.Bitmap, sourceRegion, output, destinationRegion);
+				BitmapUtils.CopyRect(sourceGlyph.Bitmap, sourceRegion, output, destinationRegion);
 
 				// TODO: This causes artifacts around borders.
 				//BitmapUtils.PadBorderPixels(output, destinationRegion);
@@ -172,7 +170,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			int maxWidth = 0;
 			int totalSize = 0;
 
-			foreach (var glyph in sourceGlyphs)
+			foreach (Glyph glyph in sourceGlyphs)
 			{
 				maxWidth = Math.Max(maxWidth, glyph.Bitmap.Width);
 				totalSize += glyph.Bitmap.Width * glyph.Bitmap.Height;
@@ -187,7 +185,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 		// Rounds a value up to the next larger valid texture size.
 		static int MakeValidTextureSize(int value, bool requirePowerOfTwo)
 		{
-			// In case we want to compress the texture, make sure the size is a multiple of 4.
+			// In case we want to DXT compress, make sure the size is a multiple of 4.
 			const int blockSize = 4;
 
 			if (requirePowerOfTwo)

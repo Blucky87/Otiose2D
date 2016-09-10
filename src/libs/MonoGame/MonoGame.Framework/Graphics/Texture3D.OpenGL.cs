@@ -7,13 +7,9 @@ using System.IO;
 using System.Runtime.InteropServices;
 
 #if MONOMAC
-#if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
-#else
+#elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#endif
-#elif DESKTOPGL
-using OpenGL;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -28,19 +24,16 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             this.glTarget = TextureTarget.Texture3D;
 
-            Threading.BlockOnUIThread(() =>
-            {
-                GL.GenTextures(1, out this.glTexture);
-                GraphicsExtensions.CheckGLError();
+            GL.GenTextures(1, out this.glTexture);
+            GraphicsExtensions.CheckGLError();
 
-                GL.BindTexture(glTarget, glTexture);
-                GraphicsExtensions.CheckGLError();
+            GL.BindTexture(glTarget, glTexture);
+            GraphicsExtensions.CheckGLError();
 
-                format.GetGLFormat(GraphicsDevice, out glInternalFormat, out glFormat, out glType);
+            format.GetGLFormat(GraphicsDevice, out glInternalFormat, out glFormat, out glType);
 
-                GL.TexImage3D(glTarget, 0, glInternalFormat, width, height, depth, 0, glFormat, glType, IntPtr.Zero);
-                GraphicsExtensions.CheckGLError();
-            });
+            GL.TexImage3D(glTarget, 0, glInternalFormat, width, height, depth, 0, glFormat, glType, IntPtr.Zero);
+            GraphicsExtensions.CheckGLError();
 
             if (mipMap)
                 throw new NotImplementedException("Texture3D does not yet support mipmaps.");
@@ -54,19 +47,16 @@ namespace Microsoft.Xna.Framework.Graphics
 #if GLES
             throw new NotSupportedException("OpenGL ES 2.0 doesn't support 3D textures.");
 #else
-            Threading.BlockOnUIThread(() =>
-            {
-                var elementSizeInByte = Marshal.SizeOf(typeof(T));
-                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
+            var elementSizeInByte = Marshal.SizeOf(typeof(T));
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
 
-                GL.BindTexture(glTarget, glTexture);
-                GraphicsExtensions.CheckGLError();
-                GL.TexSubImage3D(glTarget, level, left, top, front, width, height, depth, glFormat, glType, dataPtr);
-                GraphicsExtensions.CheckGLError();
+            GL.BindTexture(glTarget, glTexture);
+            GraphicsExtensions.CheckGLError();
+            GL.TexSubImage3D(glTarget, level, left, top, front, width, height, depth, glFormat, glType, dataPtr);
+            GraphicsExtensions.CheckGLError();
 
-                dataHandle.Free();
-            });
+            dataHandle.Free();
 #endif
         }
 

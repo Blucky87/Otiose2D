@@ -2,13 +2,12 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public enum AskResult
+    enum AskResult
     {
         Yes,
         No,
@@ -22,11 +21,9 @@ namespace MonoGame.Tools.Pipeline
         Skip
     }
 
-    public interface IView
+    interface IView
     {
         void Attach(IController controller);
-
-        void Invoke(Action action);
 
         AskResult AskSaveOrCancel();
 
@@ -40,23 +37,23 @@ namespace MonoGame.Tools.Pipeline
 
         void ShowMessage(string message);
 
-        bool ShowDeleteDialog(List<IProjectItem> items);
-
-        bool ShowEditDialog(string title, string text, string oldname, bool file, out string newname);
-
         void BeginTreeUpdate();
 
         void SetTreeRoot(IProjectItem item);
 
         void AddTreeItem(IProjectItem item);
 
-        void RemoveTreeItem(IProjectItem item);
+        void AddTreeFolder(string folder);
+
+        void RemoveTreeItem(ContentItem contentItem);
+
+        void RemoveTreeFolder(string folder);
 
         void UpdateTreeItem(IProjectItem item);
 
         void EndTreeUpdate();
 
-        void UpdateProperties();
+        void UpdateProperties(IProjectItem item);
 
         void OutputAppend(string text);
 
@@ -64,18 +61,16 @@ namespace MonoGame.Tools.Pipeline
 
         bool ChooseContentFile(string initialDirectory, out List<string> files);  
 
-        bool ChooseContentFolder(string initialDirectory, out string folder);
-
-        bool ChooseItemTemplate(string folder, out ContentItemTemplate template, out string name);
+        bool ChooseContentFolder(string initialDirectory, out string folder);        
 
         bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall);
 
-        bool CopyOrLinkFolder(string folder, bool exists, out CopyAction action, out bool applyforall);
+        bool CopyOrLinkFolder(string folder, out CopyAction action);
+        
+        void OnTemplateDefined(ContentItemTemplate item);
 
         Process CreateProcess(string exe, string commands);
 
-        void UpdateCommands(MenuInfo info);
-
-        void UpdateRecentList(List<string> recentList);
+        void ItemExistanceChanged(IProjectItem item);
     }
 }

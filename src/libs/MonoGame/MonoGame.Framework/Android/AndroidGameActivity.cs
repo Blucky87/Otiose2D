@@ -90,7 +90,6 @@ namespace Microsoft.Xna.Framework
 		protected override void OnDestroy ()
 		{
             UnregisterReceiver(screenReceiver);
-            ScreenReceiver.ScreenLocked = false;
             _orientationListener = null;
             if (Game != null)
                 Game.Dispose();

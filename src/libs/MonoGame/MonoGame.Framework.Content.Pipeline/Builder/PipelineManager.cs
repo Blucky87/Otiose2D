@@ -48,12 +48,6 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         // with different parameters.)
         private readonly Dictionary<string, List<PipelineBuildEvent>> _pipelineBuildEvents;
 
-        // Store default values for content processor parameters. (Necessary to compare processor
-        // parameters. See PipelineBuildEvent.AreParametersEqual.)
-        //   Key = name of content processor
-        //   Value = processor parameters
-        private readonly Dictionary<string, OpaqueDataDictionary> _processorDefaultValues;
-
         public string ProjectDirectory { get; private set; }
         public string OutputDirectory { get; private set; }
         public string IntermediateDirectory { get; private set; }
@@ -94,7 +88,6 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         public PipelineManager(string projectDir, string outputDir, string intermediateDir)
         {
             _pipelineBuildEvents = new Dictionary<string, List<PipelineBuildEvent>>();
-            _processorDefaultValues = new Dictionary<string, OpaqueDataDictionary>();
             RethrowExceptions = true;
 
             Assemblies = new List<string>();
@@ -384,47 +377,6 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             return processor;
         }
 
-        /// <summary>
-        /// Gets the default values for the content processor parameters.
-        /// </summary>
-        /// <param name="processorName">The name of the content processor.</param>
-        /// <returns>
-        /// A dictionary containing the default value for each parameter. Returns
-        /// <see langword="null"/> if the content processor has not been created yet.
-        /// </returns>
-        public OpaqueDataDictionary GetProcessorDefaultValues(string processorName)
-        {
-            // null is not allowed as key in dictionary.
-            if (processorName == null)
-                processorName = string.Empty;
-
-            OpaqueDataDictionary defaultValues;
-            if (!_processorDefaultValues.TryGetValue(processorName, out defaultValues))
-            {
-                // Create the content processor instance and read the default values.
-                defaultValues = new OpaqueDataDictionary();
-                var processorType = GetProcessorType(processorName);
-                if (processorType != null)
-                {
-                    try
-                    {
-                        var processor = (IContentProcessor)Activator.CreateInstance(processorType);
-                        var properties = processorType.GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.Instance);
-                        foreach (var property in properties)
-                            defaultValues.Add(property.Name, property.GetValue(processor, null));
-                    }
-                    catch
-                    {
-                        // Ignore exception. Will be handled in ProcessContent.
-                    }
-                }
-
-                _processorDefaultValues.Add(processorName, defaultValues);
-            }
-
-            return defaultValues;
-        }
-
         public DateTime GetProcessorAssemblyTimestamp(string name)
         {
             if (_processors == null)
@@ -506,26 +458,6 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             return PipelineBuildEvent.Load(eventFilepath);
         }
 
-        public void RegisterContent(string sourceFilepath, string outputFilepath = null, string importerName = null, string processorName = null, OpaqueDataDictionary processorParameters = null)
-        {
-            sourceFilepath = PathHelper.Normalize(sourceFilepath);
-            ResolveOutputFilepath(sourceFilepath, ref outputFilepath);
-
-            ResolveImporterAndProcessor(sourceFilepath, ref importerName, ref processorName);
-
-            var contentEvent = new PipelineBuildEvent
-            {
-                SourceFile = sourceFilepath,
-                DestFile = outputFilepath,
-                Importer = importerName,
-                Processor = processorName,
-                Parameters = ValidateProcessorParameters(processorName, processorParameters),
-            };
-
-            // Register pipeline build event. (Required to correctly resolve external dependencies.)
-            TrackPipelineBuildEvent(contentEvent);
-        }
-
         public PipelineBuildEvent BuildContent(string sourceFilepath, string outputFilepath = null, string importerName = null, string processorName = null, OpaqueDataDictionary processorParameters = null)
         {
             sourceFilepath = PathHelper.Normalize(sourceFilepath);
@@ -555,77 +487,68 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         private void BuildContent(PipelineBuildEvent pipelineEvent, PipelineBuildEvent cachedEvent, string eventFilepath)
         {
             if (!File.Exists(pipelineEvent.SourceFile))
-            {
-                Logger.LogMessage("{0}", pipelineEvent.SourceFile);
                 throw new PipelineException("The source file '{0}' does not exist!", pipelineEvent.SourceFile);
-            }
 
             Logger.PushFile(pipelineEvent.SourceFile);
 
             // Keep track of all build events. (Required to resolve automatic names "AssetName_n".)
             TrackPipelineBuildEvent(pipelineEvent);
 
-            var rebuild = pipelineEvent.NeedsRebuild(this, cachedEvent);            
-            if (rebuild)
-                Logger.LogMessage("{0}", pipelineEvent.SourceFile);
-            else
-                Logger.LogMessage("Skipping {0}", pipelineEvent.SourceFile);
-            
-            Logger.Indent();
-            try
+            var rebuild = pipelineEvent.NeedsRebuild(this, cachedEvent);
+            if (!rebuild)
             {
-                if (!rebuild)
+                // While this asset doesn't need to be rebuilt the dependent assets might.
+                foreach (var asset in cachedEvent.BuildAsset)
                 {
-                    // While this asset doesn't need to be rebuilt the dependent assets might.
-                    foreach (var asset in cachedEvent.BuildAsset)
+                    string assetEventFilepath;
+                    var assetCachedEvent = LoadBuildEvent(asset, out assetEventFilepath);
+
+                    // If we cannot find the cached event for the dependancy
+                    // then we have to trigger a rebuild of the parent content.
+                    if (assetCachedEvent == null)
                     {
-                        string assetEventFilepath;
-                        var assetCachedEvent = LoadBuildEvent(asset, out assetEventFilepath);
-
-                        // If we cannot find the cached event for the dependancy
-                        // then we have to trigger a rebuild of the parent content.
-                        if (assetCachedEvent == null)
-                        {
-                            rebuild = true;
-                            break;
-                        }
-
-                        var depEvent = new PipelineBuildEvent
-                        {
-                            SourceFile = assetCachedEvent.SourceFile,
-                            DestFile = assetCachedEvent.DestFile,
-                            Importer = assetCachedEvent.Importer,
-                            Processor = assetCachedEvent.Processor,
-                            Parameters = assetCachedEvent.Parameters,
-                        };
-
-                        // Give the asset a chance to rebuild.                    
-                        BuildContent(depEvent, assetCachedEvent, assetEventFilepath);
+                        rebuild = true;
+                        break;
                     }
-                }
 
-                // Do we need to rebuild?
-                if (rebuild)
-                {
-                    // Import and process the content.
-                    var processedObject = ProcessContent(pipelineEvent);
+                    var depEvent = new PipelineBuildEvent
+                    {
+                        SourceFile = assetCachedEvent.SourceFile,
+                        DestFile = assetCachedEvent.DestFile,
+                        Importer = assetCachedEvent.Importer,
+                        Processor = assetCachedEvent.Processor,
+                        Parameters = assetCachedEvent.Parameters,
+                    };
 
-                    // Write the content to disk.
-                    WriteXnb(processedObject, pipelineEvent);
-
-                    // Store the timestamp of the DLLs containing the importer and processor.
-                    pipelineEvent.ImporterTime = GetImporterAssemblyTimestamp(pipelineEvent.Importer);
-                    pipelineEvent.ProcessorTime = GetProcessorAssemblyTimestamp(pipelineEvent.Processor);
-
-                    // Store the new event into the intermediate folder.
-                    pipelineEvent.Save(eventFilepath);
+                    // Give the asset a chance to rebuild.                    
+                    BuildContent(depEvent, assetCachedEvent, assetEventFilepath);
                 }
             }
-            finally
+
+            // Do we need to rebuild?
+            if (rebuild)
             {
-                Logger.Unindent();
-                Logger.PopFile();
+                Logger.LogMessage("{0}", pipelineEvent.SourceFile);
+
+                // Import and process the content.
+                var processedObject = ProcessContent(pipelineEvent);
+
+                // Write the content to disk.
+                WriteXnb(processedObject, pipelineEvent);
+
+                // Store the timestamp of the DLLs containing the importer and processor.
+                pipelineEvent.ImporterTime = GetImporterAssemblyTimestamp(pipelineEvent.Importer);
+                pipelineEvent.ProcessorTime = GetProcessorAssemblyTimestamp(pipelineEvent.Processor);
+
+                // Store the new event into the intermediate folder.
+                pipelineEvent.Save(eventFilepath);
             }
+            else
+            {
+                Logger.LogMessage("Skipping {0}", pipelineEvent.SourceFile);
+            }
+
+            Logger.PopFile();
         }
 
         public object ProcessContent(PipelineBuildEvent pipelineEvent)
@@ -792,14 +715,13 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         private void TrackPipelineBuildEvent(PipelineBuildEvent pipelineEvent)
         {
             List<PipelineBuildEvent> pipelineBuildEvents;
-            bool eventsFound = _pipelineBuildEvents.TryGetValue(pipelineEvent.SourceFile, out pipelineBuildEvents);
-            if (!eventsFound)
+            if (!_pipelineBuildEvents.TryGetValue(pipelineEvent.SourceFile, out pipelineBuildEvents))
             {
                 pipelineBuildEvents = new List<PipelineBuildEvent>();
                 _pipelineBuildEvents.Add(pipelineEvent.SourceFile, pipelineBuildEvents);
             }
 
-            if (FindMatchingEvent(pipelineBuildEvents, pipelineEvent.DestFile, pipelineEvent.Importer, pipelineEvent.Processor, pipelineEvent.Parameters) == null)
+            if (FindMatchingEvent(pipelineBuildEvents, pipelineEvent.Importer, pipelineEvent.Processor, pipelineEvent.Parameters) == null)
                 pipelineBuildEvents.Add(pipelineEvent);
         }
 
@@ -826,7 +748,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 // --> Compare pipeline build events.
                 ResolveImporterAndProcessor(sourceFileName, ref importerName, ref processorName);
 
-                var matchingEvent = FindMatchingEvent(pipelineBuildEvents, null, importerName, processorName, processorParameters);
+                var matchingEvent = FindMatchingEvent(pipelineBuildEvents, importerName, processorName, processorParameters);
                 if (matchingEvent != null)
                 {
                     // Matching pipeline build event found.
@@ -852,26 +774,21 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// Determines whether the specified list contains a matching pipeline build event.
         /// </summary>
         /// <param name="pipelineBuildEvents">The list of pipeline build events.</param>
-        /// <param name="destFile">Absolute path to the output file. Can be <see langword="null"/>.</param>
         /// <param name="importerName">The name of the content importer. Can be <see langword="null"/>.</param>
         /// <param name="processorName">The name of the content processor. Can be <see langword="null"/>.</param>
         /// <param name="processorParameters">The processor parameters. Can be <see langword="null"/>.</param>
         /// <returns>
         /// The matching pipeline build event, or <see langword="null"/>.
         /// </returns>
-        private PipelineBuildEvent FindMatchingEvent(List<PipelineBuildEvent> pipelineBuildEvents, string destFile, string importerName, string processorName, OpaqueDataDictionary processorParameters)
+        private static PipelineBuildEvent FindMatchingEvent(List<PipelineBuildEvent> pipelineBuildEvents, string importerName, string processorName, OpaqueDataDictionary processorParameters)
         {
             foreach (var existingBuildEvent in pipelineBuildEvents)
             {
-                if ((destFile == null || existingBuildEvent.DestFile.Equals(destFile))
-                    && existingBuildEvent.Importer == importerName
-                    && existingBuildEvent.Processor == processorName)
+                if (existingBuildEvent.Importer == importerName
+                    && existingBuildEvent.Processor == processorName
+                    && PipelineBuildEvent.AreParametersEqual(existingBuildEvent.Parameters, processorParameters))
                 {
-                    var defaultValues = GetProcessorDefaultValues(processorName);
-                    if (PipelineBuildEvent.AreParametersEqual(existingBuildEvent.Parameters, processorParameters, defaultValues))
-                    {
-                        return existingBuildEvent;
-                    }
+                    return existingBuildEvent;
                 }
             }
 

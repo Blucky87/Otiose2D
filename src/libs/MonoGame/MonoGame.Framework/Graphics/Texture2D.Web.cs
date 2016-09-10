@@ -11,7 +11,6 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
-            
             throw new NotImplementedException();
         }
 

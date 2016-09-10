@@ -16,10 +16,6 @@ namespace Microsoft.Xna.Framework.Media
         private static MediaEngine _mediaEngineEx;
         private static CoreDispatcher _dispatcher;
 
-        private enum SessionState { Stopped, Started, Paused }
-        private static SessionState _sessionState = SessionState.Stopped;
-        private static TimeSpan? _desiredPosition;
-
         private static void PlatformInitialize()
         {
             MediaManager.Startup(true);
@@ -37,18 +33,10 @@ namespace Microsoft.Xna.Framework.Media
 
         private static void MediaEngineExOnPlaybackEvent(MediaEngineEvent mediaEvent, long param1, int param2)
         {
-            if (mediaEvent == MediaEngineEvent.LoadedData)
-            {
-                if (_desiredPosition.HasValue)
-                    _mediaEngineEx.CurrentTime = _desiredPosition.Value.TotalSeconds;
-                if (_sessionState == SessionState.Started)
-                    _mediaEngineEx.Play();
-            }
-            if (mediaEvent == MediaEngineEvent.Ended)
-            {
-                _sessionState = SessionState.Stopped;
-                _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => OnSongFinishedPlaying(null, null)).AsTask();
-            }
+            if (mediaEvent != MediaEngineEvent.Ended)
+                return;
+
+            _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => OnSongFinishedPlaying(null, null)).AsTask();
         }
 
         #region Properties
@@ -119,33 +107,23 @@ namespace Microsoft.Xna.Framework.Media
 
         private static void PlatformPause()
         {
-            if (_sessionState != SessionState.Started)
-                return;
-            _sessionState = SessionState.Paused;
             _mediaEngineEx.Pause();
         }
 
-        private static void PlatformPlaySong(Song song, TimeSpan? startPosition)
+        private static void PlatformPlaySong(Song song)
         {
             _mediaEngineEx.Source = song.FilePath;
             _mediaEngineEx.Load();
-            _desiredPosition = startPosition;
-            _sessionState = SessionState.Started;
-
-            //We start playing when we get a LoadedData event in MediaEngineExOnPlaybackEvent
+            _mediaEngineEx.Play();
         }
 
         private static void PlatformResume()
         {
-            if (_sessionState != SessionState.Paused)
-                return;
-            _mediaEngineEx.Play();
+            _mediaEngineEx.Play(); 
         }
 
         private static void PlatformStop()
         {
-            if (_sessionState == SessionState.Stopped)
-                return;
             _mediaEngineEx.Source = null;
         }
     }

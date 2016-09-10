@@ -5,16 +5,11 @@
 using System;
 using System.Collections.Generic;
 
-#if MONOMAC && PLATFORM_MACOS_LEGACY
+#if MONOMAC
 using MonoMac.OpenGL;
-#endif
-#if (MONOMAC && !PLATFORM_MACOS_LEGACY)
+#elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#endif
-#if DESKTOPGL
-using OpenGL;
-#endif
-#if GLES
+#else
 using OpenTK.Graphics.ES20;
 #endif
 
@@ -33,7 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Get the vertex attribute info and cache it
                 attrInfo = new VertexDeclarationAttributeInfo(GraphicsDevice.MaxVertexAttributes);
 
-                foreach (var ve in InternalVertexElements)
+                foreach (var ve in _elements)
                 {
                     var attributeLocation = shader.GetAttribLocation(ve.VertexElementUsage, ve.UsageIndex);
                     // XNA appears to ignore usages it can't find a match for, so we will do the same

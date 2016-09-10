@@ -24,10 +24,13 @@ namespace Microsoft.Xna.Framework.Media
 
             SharpDX.MediaFoundation.MediaSource mediaSource;
             {
-                SourceResolver resolver = new SourceResolver();
+                SourceResolver resolver;
+                MediaFactory.CreateSourceResolver(out resolver);
 
                 ObjectType otype;
-                ComObject source = resolver.CreateObjectFromURL(FileName, SourceResolverFlags.MediaSource, null, out otype);
+                ComObject source;
+                resolver.CreateObjectFromURL(FileName, (int)SourceResolverFlags.MediaSource, null, out otype,
+                                                out source);
                 mediaSource = source.QueryInterface<SharpDX.MediaFoundation.MediaSource>();
                 resolver.Dispose();
                 source.Dispose();

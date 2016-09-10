@@ -2,70 +2,59 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public partial class PipelineController
+    internal partial class PipelineController
     {        
         private class ExcludeAction : IProjectAction
         {
             private readonly PipelineController _con;
-            private readonly List<IProjectItem> _items;
-            private readonly List<ContentItem> _subitems;
-            private readonly bool _delete;
+            private readonly ContentItemState[] _state;
+            private readonly string[] _folder;
 
-            public ExcludeAction(PipelineController controller, List<IProjectItem> items, bool delete)
+            public ExcludeAction(PipelineController controller, IEnumerable<ContentItem> items, IEnumerable<string> folders)
             {
-                _items = new List<IProjectItem>();
-                _subitems = new List<ContentItem>();
-
                 _con = controller;
-                _items.AddRange(items);
-                _delete = delete;
+                _folder = (folders == null) ? new string[0] : folders.ToArray();
 
-                foreach (var item in items)
-                    if (item is DirectoryItem)
-                        foreach (var citem in _con._project.ContentItems)
-                            if (citem.OriginalPath.StartsWith(item.OriginalPath))
-                                _subitems.Add(citem);
+                if(items == null)
+                    _state = new ContentItemState[0];
+                else
+                {
+                    _state = new ContentItemState[items.Count()];
+                    
+                    var i = 0;
+                    foreach (var item in items)
+                    {
+                        _state[i++] = ContentItemState.Get(item);
+                    }
+                }
             }
 
             public bool Do()
             {
                 _con.View.BeginTreeUpdate();
 
-                foreach (var item in _items)
+                foreach (var obj in _state)
                 {
-                    if (item is ContentItem)
-                        _con._project.ContentItems.Remove(item as ContentItem);
-                    _con.View.RemoveTreeItem(item);
-
-                    if (_delete)
+                    for (var i = 0; i < _con._project.ContentItems.Count; i++)
                     {
-                        try
+                        var item = _con._project.ContentItems[i];
+                        if (item.OriginalPath == obj.SourceFile)
                         {
-                            if (item is DirectoryItem)
-                                Directory.Delete(_con.GetFullPath(item.OriginalPath), true);
-                            else
-                                File.Delete(_con.GetFullPath(item.OriginalPath));
-                        }
-                        catch (FileNotFoundException ex)
-                        {
-                            // No error needed in case file is not found
-                        }
-                        catch (Exception ex)
-                        {
-                            _con.View.ShowError("Error while trying to delete the file", ex.Message);
+                            _con._project.ContentItems.Remove(item);
+                            _con.View.RemoveTreeItem(item);
+                            break;
                         }
                     }
                 }
 
-                foreach (var sitem in _subitems)
-                    _con._project.ContentItems.Remove(sitem);
+                foreach(string f in _folder)
+                    _con.View.RemoveTreeFolder(f);
 
                 _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;
@@ -75,20 +64,21 @@ namespace MonoGame.Tools.Pipeline
 
             public bool Undo()
             {
-                if (_delete)
-                    return false;
-
                 _con.View.BeginTreeUpdate();
 
-                foreach (var item in _items)
-                {
-                    if(item is ContentItem)
-                        _con._project.ContentItems.Add(item as ContentItem);
-                    _con.View.AddTreeItem(item);
-                }
+                foreach(string f in _folder)
+                    _con.View.AddTreeFolder(f);
 
-                foreach (var item in _subitems)
+                foreach (var obj in _state)
                 {
+                    var item = new ContentItem()
+                        {
+                            Observer = _con,
+                            Exists = File.Exists(System.IO.Path.GetDirectoryName(_con._project.OriginalPath) + Path.DirectorySeparatorChar + obj.SourceFile)
+                        };
+                    obj.Apply(item);
+                    item.ResolveTypes();
+
                     _con._project.ContentItems.Add(item);
                     _con.View.AddTreeItem(item);
                 }

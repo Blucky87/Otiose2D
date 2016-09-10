@@ -53,10 +53,8 @@ namespace Microsoft.Xna.Framework.Media
 			DonePlaying += handler;
 		}
 
-		internal void Play(TimeSpan? startPosition)
+		internal void Play()
 		{	
-			if (startPosition.HasValue)
-				throw new Exception("startPosition not implemented on this Platform"); //Should be possible to implement in OpenAL
 			if ( _sound == null )
 				return;
 

@@ -33,49 +33,38 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public class DisplayModeCollection : IEnumerable<DisplayMode>
+    public class DisplayModeCollection : IEnumerable<DisplayMode>, IEnumerable
     {
-        private readonly List<DisplayMode> _modes;
+        private readonly List<DisplayMode> modes;
 
         public IEnumerable<DisplayMode> this[SurfaceFormat format]
         {
-            get 
-            {
-                var list = new List<DisplayMode>();
-                foreach (var mode in _modes)
+            get {
+                List<DisplayMode> list = new List<DisplayMode>();
+                foreach (DisplayMode mode in this.modes)
                 {
                     if (mode.Format == format)
+                    {
                         list.Add(mode);
+                    }
                 }
                 return list;
+
             }
         }
 
         public IEnumerator<DisplayMode> GetEnumerator()
         {
-            return _modes.GetEnumerator();
+            return modes.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return _modes.GetEnumerator();
+            return modes.GetEnumerator();
         }
         
-        internal DisplayModeCollection(List<DisplayMode> modes) 
-        {
-            // Sort the modes in a consistent way that happens
-            // to match XNA behavior on some graphics devices.
-
-            modes.Sort(delegate(DisplayMode a, DisplayMode b)
-            {
-                if (a == b) 
-                    return 0;
-                if (a.Format <= b.Format && a.Width <= b.Width && a.Height <= b.Height) 
-                    return -1;
-                return 1;
-            });
-
-            _modes = modes;
+        public DisplayModeCollection(List<DisplayMode> setmodes) {
+            modes = setmodes;
         }
     }
 }

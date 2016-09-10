@@ -55,10 +55,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="meshes">The collection of meshes.</param>
         public Model(GraphicsDevice graphicsDevice, List<ModelBone> bones, List<ModelMesh> meshes)
 		{
-            if (graphicsDevice == null)
-            {
-                throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
-            }
+            if(graphicsDevice == null)throw new ArgumentNullException("graphicsDevice");
 
 			// TODO: Complete member initialization
 			this.graphicsDevice = graphicsDevice;

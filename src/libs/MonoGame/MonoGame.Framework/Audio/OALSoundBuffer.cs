@@ -4,21 +4,11 @@
 
 using System;
 
-#if MONOMAC && PLATFORM_MACOS_LEGACY
+#if MONOMAC
 using MonoMac.OpenAL;
-#endif
-#if MONOMAC && !PLATFORM_MACOS_LEGACY
+#else
 using OpenTK.Audio.OpenAL;
 #endif
-
-#if GLES 
-using OpenTK.Audio.OpenAL;
-#endif
-
-#if DESKTOPGL
-using OpenAL;
-#endif
-
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -28,14 +18,21 @@ namespace Microsoft.Xna.Framework.Audio
 		ALFormat openALFormat;
 		int dataSize;
 		int sampleRate;
+		private int _sourceId;
         bool _isDisposed;
+        internal int _pauseCount;
 
 		public OALSoundBuffer ()
 		{
             try
             {
+                var alError = AL.GetError();
                 AL.GenBuffers(1, out openALDataBuffer);
-                ALHelper.CheckError("Failed to generate OpenAL data buffer.");
+                alError = AL.GetError();
+                if (alError != ALError.NoError)
+                {
+                    Console.WriteLine("Failed to generate OpenAL data buffer: ", AL.GetErrorString(alError));
+                }
             }
             catch (DllNotFoundException e)
             {
@@ -59,21 +56,12 @@ namespace Microsoft.Xna.Framework.Audio
 			set;
 		}
 
-        public void BindDataBuffer(byte[] dataBuffer, ALFormat format, int size, int sampleRate, int alignment = 0)
+        public void BindDataBuffer(byte[] dataBuffer, ALFormat format, int size, int sampleRate)
         {
             openALFormat = format;
             dataSize = size;
             this.sampleRate = sampleRate;
-            int unpackedSize = 0;
-#if DESKTOPGL
-            if (alignment > 0) {
-                AL.Bufferi (openALDataBuffer, ALBufferi.UnpackBlockAlignmentSoft, alignment);
-                ALHelper.CheckError ("Failed to fill buffer.");
-            }
-#endif
-
-            AL.BufferData(openALDataBuffer, openALFormat, dataBuffer, size, this.sampleRate);
-            ALHelper.CheckError("Failed to fill buffer.");
+            AL.BufferData(openALDataBuffer, openALFormat, dataBuffer, dataSize, this.sampleRate);
 
             int bits, channels;
 
@@ -91,23 +79,30 @@ namespace Microsoft.Xna.Framework.Audio
                 alError = AL.GetError();
                 if (alError != ALError.NoError)
                 {
-                    Console.WriteLine("Failed to get buffer channels: {0}, format={1}, size={2}, sampleRate={3}", AL.GetErrorString(alError), format, size, sampleRate);
+                    Console.WriteLine("Failed to get buffer bits: {0}, format={1}, size={2}, sampleRate={3}", AL.GetErrorString(alError), format, size, sampleRate);
                     Duration = -1;
                 }
                 else
                 {
-                    AL.GetBuffer (openALDataBuffer, ALGetBufferi.Size, out unpackedSize);
-                    alError = AL.GetError ();
-                    if (alError != ALError.NoError) {
-                        Console.WriteLine ("Failed to get buffer size: {0}, format={1}, size={2}, sampleRate={3}", AL.GetErrorString (alError), format, size, sampleRate);
-                        Duration = -1;
-                    } else {
-                        Duration = (float)(unpackedSize / ((bits / 8) * channels)) / (float)sampleRate;
-                    }
+                    Duration = (float)(size / ((bits / 8) * channels)) / (float)sampleRate;
                 }
             }
             //Console.WriteLine("Duration: " + Duration + " / size: " + size + " bits: " + bits + " channels: " + channels + " rate: " + sampleRate);
 
+        }
+
+        public void Pause()
+        {
+            if (_pauseCount == 0)
+                AL.SourcePause(_sourceId);
+            ++_pauseCount;
+        }
+
+        public void Resume()
+        {
+            --_pauseCount;
+            if (_pauseCount == 0)
+                AL.SourcePlay(_sourceId);
         }
 
 		public void Dispose()
@@ -127,14 +122,37 @@ namespace Microsoft.Xna.Framework.Audio
                 // Release unmanaged resources
                 if (AL.IsBuffer(openALDataBuffer))
                 {
-                    ALHelper.CheckError("Failed to fetch buffer state.");
                     AL.DeleteBuffers(1, ref openALDataBuffer);
-                    ALHelper.CheckError("Failed to delete buffer.");
                 }
 
                 _isDisposed = true;
             }
         }
+
+		public int SourceId
+		{
+			get {
+				return _sourceId;
+			}
+
+			set {
+				_sourceId = value;
+				if (Reserved != null)
+					Reserved(this, EventArgs.Empty);
+
+			}
+		}
+
+		public void RecycleSoundBuffer()
+		{
+			if (Recycled != null)
+				Recycled(this, EventArgs.Empty);
+		}
+
+		#region Events
+		public event EventHandler<EventArgs> Reserved;
+		public event EventHandler<EventArgs> Recycled;
+		#endregion
 	}
 }
 

@@ -54,9 +54,25 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var options = new Options();
             options.SourceFile = input.Identity.SourceFilename;
 
-            options.Profile = ShaderProfile.ForPlatform(context.TargetPlatform.ToString());
-            if (options.Profile == null)
-                throw new InvalidContentException(string.Format("{0} effects are not supported.", context.TargetPlatform), input.Identity);
+            switch (context.TargetPlatform)
+            {
+                case TargetPlatform.Windows:
+                case TargetPlatform.WindowsPhone8:
+                case TargetPlatform.WindowsStoreApp:
+                    options.Profile = ShaderProfile.DirectX_11;
+                    break;
+                case TargetPlatform.WindowsGL:
+                case TargetPlatform.iOS:
+                case TargetPlatform.Android:
+                case TargetPlatform.Linux:
+                case TargetPlatform.MacOSX:
+                case TargetPlatform.Ouya:
+                case TargetPlatform.RaspberryPi:
+                    options.Profile = ShaderProfile.OpenGL;
+                    break;
+                default:
+                    throw new InvalidContentException(string.Format("{0} effects are not supported.", context.TargetPlatform), input.Identity);
+            }
 
             options.Debug = DebugMode == EffectProcessorDebugMode.Debug;
             options.Defines = Defines;

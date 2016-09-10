@@ -35,7 +35,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// The collection of curve keys.
+        /// Gets the collection of curve keys.
         /// </summary>
         [DataMember]
         public CurveKeyCollection Keys
@@ -44,7 +44,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Defines how to handle weighting values that are greater than the last control point in the curve.
+        /// Gets or sets how to handle weighting values that are greater than the last control point in the curve.
         /// </summary>
         [DataMember]
         public CurveLoopType PostLoop
@@ -54,7 +54,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Defines how to handle weighting values that are less than the first control point in the curve.
+        /// Gets or sets how to handle weighting values that are less than the first control point in the curve.
         /// </summary>
         [DataMember]
         public CurveLoopType PreLoop
@@ -68,7 +68,7 @@ namespace Microsoft.Xna.Framework
         #region Public Constructors
 
         /// <summary>
-        /// Constructs a curve.
+        /// Creates a new instance of <see cref="Curve"/> class.
         /// </summary>
         public Curve()
         {
@@ -101,16 +101,6 @@ namespace Microsoft.Xna.Framework
         /// <returns>Value at the position on this <see cref="Curve"/>.</returns>
         public float Evaluate(float position)
         {
-            if (_keys.Count == 0)
-            {
-            	return 0f;
-            }
-						
-            if (_keys.Count == 1)
-            {
-            	return _keys[0].Value;
-            }
-			
             CurveKey first = _keys[0];
             CurveKey last = _keys[_keys.Count - 1];
 

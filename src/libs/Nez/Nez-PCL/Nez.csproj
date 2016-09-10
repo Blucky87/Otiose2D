@@ -30,12 +30,9 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
-<<<<<<< HEAD
   <ItemGroup />
-=======
-<<<<<<< HEAD
+
   <ItemGroup />
-=======
   <ItemGroup>
     <Folder Include="Debug\" />
     <Folder Include="ECS\" />

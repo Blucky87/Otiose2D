@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 
 namespace Nez.AI.Pathfinding
 {
 	/// <summary>
-	/// calculates paths given an IWeightedGraph and start/goal positions
+	/// calculates paths given an IAstarGraph and start/goal positions
 	/// </summary>
 	public static class AStarPathfinder
 	{
+		/// <summary>
+		/// wraps up the raw data in a small class with the extra fields the PriorityQueue requires
+		/// </summary>
 		class AStarNode<T> : PriorityQueueNode
 		{
 			public T data;
@@ -20,7 +22,7 @@ namespace Nez.AI.Pathfinding
 		}
 
 
-		public static bool search<T>( IWeightedGraph<T> graph, T start, T goal, out Dictionary<T,T> cameFrom )
+		public static bool search<T>( IAstarGraph<T> graph, T start, T goal, out Dictionary<T,T> cameFrom )
 		{
 			var foundPath = false;
 			cameFrom = new Dictionary<T,T>();
@@ -66,7 +68,7 @@ namespace Nez.AI.Pathfinding
 		/// <param name="start">Start.</param>
 		/// <param name="goal">Goal.</param>
 		/// <typeparam name="T">The 1st type parameter.</typeparam>
-		public static List<T> search<T>( IWeightedGraph<T> graph, T start, T goal )
+		public static List<T> search<T>( IAstarGraph<T> graph, T start, T goal )
 		{
 			Dictionary<T,T> cameFrom;
 			var foundPath = search( graph, start, goal, out cameFrom );

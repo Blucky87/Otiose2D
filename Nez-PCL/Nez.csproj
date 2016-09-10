@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -30,6 +30,9 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+<<<<<<< HEAD
+  <ItemGroup />
+=======
   <ItemGroup>
     <Folder Include="Debug\" />
     <Folder Include="ECS\" />
@@ -89,7 +92,9 @@
     <Folder Include="Content\" />
     <Folder Include="Utils\Audio\" />
     <Folder Include="Graphics\Materials\" />
+    <Folder Include="AI\Pathfinding\Dijkstra\" />
   </ItemGroup>
+>>>>>>> f9f6e9cb740e6b3edf05b6b7e224e3ef2d2eb3dd
   <ItemGroup>
     <Compile Include="Debug\Debug.cs" />
     <Compile Include="ECS\Camera.cs" />
@@ -426,9 +431,9 @@
     <Compile Include="Utils\Collections\Deque.cs" />
     <Compile Include="Utils\Collections\PriorityQueueNode.cs" />
     <Compile Include="Utils\Collections\PriorityQueue.cs" />
-    <Compile Include="AI\Pathfinding\AStar\IWeightedGraph.cs" />
+    <Compile Include="AI\Pathfinding\AStar\IAstarGraph.cs" />
     <Compile Include="AI\Pathfinding\BreadthFirst\BreadthFirstPathfinder.cs" />
-    <Compile Include="AI\Pathfinding\AStar\WeightedGridGraph.cs" />
+    <Compile Include="AI\Pathfinding\AStar\AstarGridGraph.cs" />
     <Compile Include="AI\Pathfinding\BreadthFirst\IUnweightedGraph.cs" />
     <Compile Include="AI\Pathfinding\AStar\AStarPathfinder.cs" />
     <Compile Include="AI\Pathfinding\BreadthFirst\UnweightedGraph.cs" />
@@ -493,6 +498,10 @@
     <Compile Include="Utils\Extensions\SoundEffectInstanceExt.cs" />
     <Compile Include="Physics\ColliderTriggerHelper.cs" />
     <Compile Include="ECS\Components\ColorCycler.cs" />
+    <Compile Include="ECS\Components\Renderables\Sprites\PrototypeSprite.cs" />
+    <Compile Include="AI\Pathfinding\Dijkstra\WeightedPathfinder.cs" />
+    <Compile Include="AI\Pathfinding\Dijkstra\IWeightedGraph.cs" />
+    <Compile Include="AI\Pathfinding\Dijkstra\WeightedGridGraph.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

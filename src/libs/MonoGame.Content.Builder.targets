@@ -30,7 +30,7 @@
       <MonoExe Condition=" '$(OS)' != 'Windows_NT' And Exists ('/usr/bin/mono') ">/usr/bin/mono</MonoExe>
       <MonoExe Condition=" '$(OS)' != 'Windows_NT' And '$(MonoExe)' == '' ">mono</MonoExe>
 
-      <MonoGameContentBuilderExe Condition="'$(MonoGameContentBuilderExe)' == ''">$(MSBuildThisFileDirectory)\MonoGame\Tools\MGCB\bin\Windows\AnyCPU\Debug\MGCB.exe</MonoGameContentBuilderExe>
+      <MonoGameContentBuilderExe Condition="'$(MonoGameContentBuilderExe)' == ''">$(MSBuildThisFileDirectory)MonoGame\Tools\MGCB\bin\Windows\AnyCPU\Debug\MGCB.exe</MonoGameContentBuilderExe>
       <MonoGameContentBuilderCmd>&quot;$(MonoGameContentBuilderExe)&quot;</MonoGameContentBuilderCmd>
       <MonoGameContentBuilderCmd Condition=" '$(OS)' != 'Windows_NT' ">$(MonoExe) $(MonoGameContentBuilderCmd)</MonoGameContentBuilderCmd>
 

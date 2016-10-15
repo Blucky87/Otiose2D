@@ -5,9 +5,9 @@
 
 using Microsoft.Xna.Framework.Content;
 
-namespace Nez.SpriterAnimator
+namespace Nez.Spriter.Content
 {
-  public class SpriterTypeReader : ContentTypeReader<Spriter>
+    public class SpriterTypeReader : ContentTypeReader<Spriter>
     {
         public static SpriterReader Reader { get; set; }
 

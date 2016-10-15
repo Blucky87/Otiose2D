@@ -22,8 +22,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Otiose2D", "Otiose2D.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MGCB.Windows", "src\libs\MonoGame\Tools\MGCB\MGCB.Windows.csproj", "{4243474D-572E-6E69-646F-77734D474342}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pipeline.Windows", "src\libs\MonoGame\Tools\Pipeline\Pipeline.Windows.csproj", "{65706950-696C-656E-2E57-696E646F7773}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -129,18 +127,6 @@ Global
 		{4243474D-572E-6E69-646F-77734D474342}.Release|x64.Build.0 = Release|Any CPU
 		{4243474D-572E-6E69-646F-77734D474342}.Release|x86.ActiveCfg = Release|Any CPU
 		{4243474D-572E-6E69-646F-77734D474342}.Release|x86.Build.0 = Release|Any CPU
-		{65706950-696C-656E-2E57-696E646F7773}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{65706950-696C-656E-2E57-696E646F7773}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{65706950-696C-656E-2E57-696E646F7773}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{65706950-696C-656E-2E57-696E646F7773}.Debug|x64.Build.0 = Debug|Any CPU
-		{65706950-696C-656E-2E57-696E646F7773}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{65706950-696C-656E-2E57-696E646F7773}.Debug|x86.Build.0 = Debug|Any CPU
-		{65706950-696C-656E-2E57-696E646F7773}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{65706950-696C-656E-2E57-696E646F7773}.Release|Any CPU.Build.0 = Release|Any CPU
-		{65706950-696C-656E-2E57-696E646F7773}.Release|x64.ActiveCfg = Release|Any CPU
-		{65706950-696C-656E-2E57-696E646F7773}.Release|x64.Build.0 = Release|Any CPU
-		{65706950-696C-656E-2E57-696E646F7773}.Release|x86.ActiveCfg = Release|Any CPU
-		{65706950-696C-656E-2E57-696E646F7773}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

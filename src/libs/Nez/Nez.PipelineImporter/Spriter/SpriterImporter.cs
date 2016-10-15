@@ -6,9 +6,9 @@
 using Microsoft.Xna.Framework.Content.Pipeline;
 using System.IO;
 
-namespace Nez.SpriterImporter
+namespace Nez.Spriter.Importer
 {
-  [ContentImporter(".scml", DisplayName = "Scml Importer", DefaultProcessor = "PassThroughProcessor")]
+    [ContentImporter(".scml", DisplayName = "Scml Importer", DefaultProcessor = "PassThroughProcessor")]
     public class SpriterImporter : ContentImporter<SpriterDataWrapper>
     {
         public override SpriterDataWrapper Import(string filename, ContentImporterContext context)

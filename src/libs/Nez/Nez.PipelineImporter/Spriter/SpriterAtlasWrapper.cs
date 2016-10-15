@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Nez.SpriterImporter
+namespace Nez.Spriter.Importer
 {
-  public class SpriterAtlasWrapper
+	public class SpriterAtlasWrapper
 	{
 		public string AtlasData { get; set; }
 	}

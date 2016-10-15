@@ -521,11 +521,6 @@
 /processorParam:TextureFormat=Color
 /build:GreyGuy/feet/p_foot_walk_a.png
 
-#begin GreyGuy/player.scml
-/importer:SpriterImporter
-/processor:PassThroughProcessor
-/build:GreyGuy/player.scml
-
 #begin GreyGuy/guns/hand-gun.png
 /importer:TextureImporter
 /processor:TextureProcessor

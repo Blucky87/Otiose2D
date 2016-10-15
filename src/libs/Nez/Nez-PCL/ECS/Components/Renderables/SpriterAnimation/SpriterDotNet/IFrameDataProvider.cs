@@ -3,10 +3,10 @@
 // This software may be modified and distributed under the terms
 // of the zlib license.  See the LICENSE file for details.
 
-namespace Nez.Spriter.Importer
+namespace Nez.Spriter
 {
-    public class SpriterDataWrapper
+    public interface IFrameDataProvider
     {
-        public string SpriterData { get; set; }
+        FrameData GetFrameData(float time, float deltaTime, float factor, SpriterAnimation first, SpriterAnimation second = null);
     }
 }

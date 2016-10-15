@@ -5,11 +5,11 @@
 
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 using Microsoft.Xna.Framework.Content.Pipeline;
-using Nez.SpriterAnimator;
+using Nez.Spriter.Content;
 
-namespace Nez.SpriterImporter
+namespace Nez.Spriter.Importer
 {
-  [ContentTypeWriter]
+    [ContentTypeWriter]
     public class SpriterAtlasTypeWriter : ContentTypeWriter<SpriterAtlasWrapper>
     {
         public override string GetRuntimeReader(TargetPlatform targetPlatform)

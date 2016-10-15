@@ -10,10 +10,8 @@ using Newtonsoft.Json;
 using System;
 using System.Xml.Serialization;
 using System.Xml;
-using Nez.SpriterAnimator;
 
-
-namespace Nez.SpriterImporter
+namespace Nez.Spriter.Importer
 {
     [ContentImporter(".json", DisplayName = "Spriter Atlas Importer", DefaultProcessor = "PassThroughProcessor")]
     public class SpriterAtlasImporter : ContentImporter<SpriterAtlasWrapper>

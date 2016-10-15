@@ -6,10 +6,11 @@
 using Microsoft.Xna.Framework.Content;
 using System.Xml.Serialization;
 using System.IO;
+using Nez.Spriter;
 
-namespace Nez.SpriterAnimator
+namespace Nez.Spriter.Content
 {
-  public class SpriterAtlasTypeReader : ContentTypeReader<SpriterAtlas>
+	public class SpriterAtlasTypeReader : ContentTypeReader<SpriterAtlas>
     {
 		protected override SpriterAtlas Read(ContentReader input, SpriterAtlas existingInstance)
         {
